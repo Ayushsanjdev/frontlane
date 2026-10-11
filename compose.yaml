@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: frontlane
+      POSTGRES_USER: frontlane
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - frontlane-db:/var/lib/postgresql/data
+      - ./db/001-init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U frontlane -d frontlane']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  app:
+    build: .
+    ports: ["3000:3000"]
+    env_file: .env.local
+    environment:
+      DATABASE_URL: postgresql://frontlane:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}@db:5432/frontlane
+      DB_SSL: 'false'
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  frontlane-db:
