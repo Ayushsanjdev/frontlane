@@ -14,15 +14,56 @@ Use package exports and `workspace:*` dependencies across these boundaries. The 
 
 ## Start
 
-1. Install Node.js 22.13+ and PostgreSQL. Enable Corepack with `corepack enable`, then run `pnpm install --frozen-lockfile`. The repository pins pnpm 11.24.0.
-2. At the repository root, copy `.env.example` to `.env.local` and set your database URL, app URL and secrets. Generate separate secrets with `openssl rand -hex 32`.
+1. Install Node.js 22.13+. Enable Corepack with `corepack enable`, then run `pnpm install --frozen-lockfile`. The repository pins pnpm 11.24.0. Use the Neon setup below for hosted PostgreSQL, or install PostgreSQL locally.
+2. At the repository root, copy `.env.example` to `.env.local` if it does not already exist, then set your database URL, app URL and secrets. Generate separate secrets with `openssl rand -hex 32`. Preserve existing values when updating this file.
 3. Create a Google OAuth web application in your own Google Cloud account. Configure its redirect URI as `https://YOUR-DOMAIN/api/auth/callback/google` (localhost can use HTTP). Set `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, `AUTH_SECRET`, `AUTH_URL` and `APP_URL`. Put production values in the hosting secret manager.
-4. Run `pnpm db:migrate`, optionally `pnpm db:seed`, then `pnpm dev`.
+4. Apply the schema: use the direct-connection migration command below for Neon, or `pnpm db:migrate` for local PostgreSQL. Optionally run `pnpm db:seed`, then `pnpm dev` and open `http://localhost:3000`.
 5. For production run `pnpm build` and `pnpm start`, or build the included Dockerfile. Set the same runtime variables on the host. `compose.yaml` can run the app and PostgreSQL together; set POSTGRES_PASSWORD in the compose environment first. Existing volumes require explicit migrations when the schema changes.
 
 Google sign-in is implemented but must be configured with your real OAuth credentials. No Google account or infrastructure account was created for you. Run the root commands from the repository root. Web and worker scripts load the root `.env.local`; deployment environment variables are inherited normally. Batch paths passed to `pnpm jobs:publish batch.json` resolve from your invoking directory.
 
 The shared curated dataset in `packages/database/data/seed.json` retains research dates and is optional. The homepage and board use live jobs when the database is available; curated fallback data is labeled when live retrieval fails.
+
+## Neon database setup
+
+This workspace uses Neon project `frontlane` (`restless-boat-76887992`), branch `production`. The local project link is stored in gitignored `.neon`; a fresh checkout must link again. `neon.ts` declares the database-only configuration:
+
+```ts
+import { defineConfig } from "@neon/config/v1";
+
+export default defineConfig({});
+```
+
+Run from the repository root:
+
+```sh
+npm i -g neon@latest
+neon login
+neon link --project-id restless-boat-76887992 --branch production -y
+neon config plan
+neon deploy
+```
+
+Complete the browser login when prompted. `neon link` and `neon deploy` pull Neon-managed variables into `.env.local`: pooled `DATABASE_URL` for application queries, direct `DATABASE_URL_UNPOOLED` for migrations, and `NEON_BRANCH`. Keep OAuth and other application settings in the same file. Restart `pnpm dev` after changing connection settings. Never commit connection strings or credentials.
+
+The config dependencies are already declared in `package.json`; `pnpm install --frozen-lockfile` installs them. The workspace's Neon agent skills live in `.agents/skills/`, with versions recorded in `skills-lock.json`. For optional Codex tooling, check existing configuration first and install only what is missing:
+
+```sh
+neon skills --agent codex -y
+neon mcp --agent codex --oauth -y
+```
+
+The MCP command above uses OAuth. The existing setup installed the global Codex MCP server with CLI API-key authentication; retain it if already configured. Global MCP configuration is machine-specific and is not included in this repository.
+
+`neon deploy` reconciles Neon infrastructure; the Next.js app is deployed separately. Apply Frontlane's checked-in SQL schema using the direct connection:
+
+```sh
+node --env-file-if-exists=.env.local --input-type=module -e 'process.env.DATABASE_URL=process.env.DATABASE_URL_UNPOOLED; await import("./packages/database/scripts/migrate.mjs")'
+```
+
+The initial schema has been applied to the linked production database. It does not insert jobs. To populate it, optionally run `pnpm db:seed` for the curated collection, or start the app and run `pnpm jobs:refresh` with `APP_URL` and `INGEST_TOKEN` configured. A reachable database with no jobs displays an empty live collection; curated fallback is used when live retrieval fails.
+
+For feature development, use a separate Neon branch rather than changing production data. Test future schema migrations on that branch before applying them to production.
 
 ## Deployment
 
