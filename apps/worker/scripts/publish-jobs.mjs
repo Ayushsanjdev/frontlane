@@ -1,3 +1,3 @@
 import {resolve} from 'node:path';
-import {readFile} from 'node:fs/promises';import {Batch} from '@frontlane/core/ingestion';
+import {readFile} from 'node:fs/promises';import {Batch} from '@frontlanejobs/core/ingestion';
 const file=process.argv[2];if(!file)throw Error('Usage: pnpm jobs:publish path/to/batch.json');const batch=Batch.parse(JSON.parse(await readFile(resolve(process.env.INIT_CWD||process.cwd(),file),'utf8')));if(!process.env.APP_URL||!process.env.INGEST_TOKEN)throw Error('Set APP_URL and INGEST_TOKEN');const r=await fetch(new URL('/api/ingest/jobs',process.env.APP_URL),{method:'POST',headers:{Authorization:'Bearer '+process.env.INGEST_TOKEN,'Content-Type':'application/json'},body:JSON.stringify(batch)});if(!r.ok)throw Error('Publication rejected: HTTP '+r.status);console.log(JSON.stringify(await r.json()));

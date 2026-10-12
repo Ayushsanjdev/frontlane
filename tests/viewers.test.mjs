@@ -6,7 +6,7 @@ import {PGlite} from '@electric-sql/pglite';
 
 register('./helpers/route-loader.mjs',import.meta.url);
 const pg=new PGlite();
-before(async()=>pg.exec(await readFile(new URL(import.meta.resolve('@frontlane/database/schema')),'utf8')));
+before(async()=>pg.exec(await readFile(new URL(import.meta.resolve('@frontlanejobs/database/schema')),'utf8')));
 after(()=>pg.close());
 beforeEach(async()=>{
   process.env.APP_URL='http://localhost:3000';

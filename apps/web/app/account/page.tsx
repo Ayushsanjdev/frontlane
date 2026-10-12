@@ -1,6 +1,6 @@
 import {requireUser} from '@/lib/session';
-import {database} from '@frontlane/database/client';
-import {loadProfile} from '@frontlane/core/profile';
+import {database} from '@frontlanejobs/database/client';
+import {loadProfile} from '@frontlanejobs/core/profile';
 import Account from './profile';
 
 export default async function Page(){

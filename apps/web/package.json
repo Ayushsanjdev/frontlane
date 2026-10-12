@@ -1,5 +1,5 @@
 {
-  "name": "@frontlane/web",
+  "name": "@frontlanejobs/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -24,8 +24,8 @@
     "react-dom": "19.2.6",
     "tailwind-merge": "3.6.0",
     "zod": "^3.25.76",
-    "@frontlane/core": "workspace:*",
-    "@frontlane/database": "workspace:*"
+    "@frontlanejobs/core": "workspace:*",
+    "@frontlanejobs/database": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.1",

@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
-import {database} from '@frontlane/database/client';
-import {recordViewer} from '@frontlane/core/viewers';
+import {database} from '@frontlanejobs/database/client';
+import {recordViewer} from '@frontlanejobs/core/viewers';
 
 export const runtime='nodejs';
 const cookieName='frontlane_viewer';

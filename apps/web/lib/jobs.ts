@@ -1,5 +1,5 @@
-import {database} from '@frontlane/database/client';
-import {listJobs,getJob,filterSeedJobs} from '@frontlane/core/jobs';
+import {database} from '@frontlanejobs/database/client';
+import {listJobs,getJob,filterSeedJobs} from '@frontlanejobs/core/jobs';
 import {seedJobs} from '@/lib/seed';
 import type {Job,JobCollection} from '@/lib/types';
 

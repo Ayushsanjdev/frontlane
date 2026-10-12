@@ -1,4 +1,4 @@
-# Frontlane
+# FrontlaneJobs
 
 A careers app for frontend engineers in India, built with Next.js, React, TypeScript, Tailwind CSS, and PostgreSQL. Browse employment and freelance opportunities, sign in with Google, and manage a private application tracker.
 
@@ -52,7 +52,7 @@ Open [localhost:3000](http://localhost:3000). Local web and worker commands load
 | `pnpm jobs:refresh` | Fetch and publish employer feeds |
 | `pnpm jobs:publish batch.json` | Publish a validated research batch |
 
-Add dependencies to the workspace that imports them, for example `pnpm --filter @frontlane/web add <package>`. Use package exports and `workspace:*` dependencies across workspace boundaries. Keep `pnpm-lock.yaml` as the only lockfile.
+Add dependencies to the workspace that imports them, for example `pnpm --filter @frontlanejobs/web add <package>`. Use package exports and `workspace:*` dependencies across workspace boundaries. Keep `pnpm-lock.yaml` as the only lockfile.
 
 Before submitting changes, run `pnpm typecheck`, `pnpm test`, and `pnpm build`. Database integration tests use PGlite and do not require a running PostgreSQL server. For UI changes, check responsive layouts and both themes. See [AGENTS.md](AGENTS.md) for contributor guidelines.
 
@@ -84,7 +84,7 @@ Configure Google OAuth with the deployed callback URL. Keep secrets in your host
 Configure one scheduler:
 
 - **GitHub Actions:** set repository variable `APP_URL` and secret `INGEST_TOKEN`. `.github/workflows/jobs.yml` runs daily at 02:30 UTC (8 AM IST); GitHub may delay scheduled runs.
-- **Server cron:** set `APP_URL` and `INGEST_TOKEN` on the worker. For a server using UTC, run `30 2 * * * cd /absolute/path/frontlane && pnpm jobs:refresh`.
+- **Server cron:** set `APP_URL` and `INGEST_TOKEN` on the worker. For a server using UTC, run `30 2 * * * cd /absolute/path/frontlanejobs && pnpm jobs:refresh`.
 - **Hosting cron:** `apps/web/vercel.json` schedules `GET /api/cron/jobs`. Requests require `Authorization: Bearer CRON_SECRET`; configure the secret and check your host's frequency and execution-duration limits.
 
 The daily refresh targets **50 available frontend jobs** eligible for India or explicitly worldwide remote work. It reads public Greenhouse, Lever, and SmartRecruiters employer feeds, deduplicates application URLs, and selects across employers, employment types, and remote/hybrid/onsite arrangements. Every automated listing links to the employer-provided career page or hosted ATS posting. Part-time, contract, and freelance roles are included when employers supply them; no fixed mix or 50-job minimum is guaranteed by upstream availability.

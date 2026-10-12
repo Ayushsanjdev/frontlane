@@ -2,7 +2,7 @@ import {test,beforeEach} from 'node:test';
 import assert from 'node:assert/strict';
 import {register} from 'node:module';
 register('./helpers/route-loader.mjs',import.meta.url);
-const {SOURCES}=await import('@frontlane/core/sources');
+const {SOURCES}=await import('@frontlanejobs/core/sources');
 const route=path=>import('../apps/web/app/api/'+path+'/route.ts');
 const tracker=await route('tracker'),profile=await route('profile'),jobs=await route('jobs'),cron=await route('cron/jobs');
 const user={userId:'alice',displayName:'Alice'};
@@ -101,9 +101,9 @@ test('cron reports total source failure to the production scheduler',async()=>{
 
 test('curated fallback metadata preserves job IDs and validates for tracker and ingestion',async()=>{
  const {readFile}=await import('node:fs/promises');
- const {parseApplication}=await import('@frontlane/core/tracker');
- const {Batch}=await import('@frontlane/core/ingestion');
- const data=JSON.parse(await readFile(new URL(import.meta.resolve('@frontlane/database/seed')),'utf8'));
+ const {parseApplication}=await import('@frontlanejobs/core/tracker');
+ const {Batch}=await import('@frontlanejobs/core/ingestion');
+ const data=JSON.parse(await readFile(new URL(import.meta.resolve('@frontlanejobs/database/seed')),'utf8'));
  assert.equal(data[0].id,'a70bef7354d47ad6aa6f2ccc0e62dd9fd393e91984173336610cdb04247fb7ef');
  for(const {requisitionId,...job} of data)assert.equal(parseApplication({job,stage:'Saved'}).jobId,job.id);
  const jobs=data.map(({id,source,discovered,...input})=>input);

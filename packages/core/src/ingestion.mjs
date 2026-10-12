@@ -1,4 +1,4 @@
-import {z} from 'zod';import {createHash,timingSafeEqual} from 'node:crypto';import {database} from '@frontlane/database/client';
+import {z} from 'zod';import {createHash,timingSafeEqual} from 'node:crypto';import {database} from '@frontlanejobs/database/client';
 const url=z.string().url().max(2000).refine(v=>{const u=new URL(v);return u.protocol==='https:'&&!u.username&&!u.password},'HTTPS URL required');
 const date=z.string().datetime({offset:true});
 export const JobInput=z.object({requisitionId:z.string().min(1).max(200).optional(),title:z.string().min(2).max(160),company:z.string().min(1).max(120),location:z.string().min(2).max(200),mode:z.enum(['Remote','Hybrid','Onsite']),type:z.enum(['Full-time','Freelance','Part-time','Contract']),salary:z.string().max(160),tags:z.array(z.string().max(40)).max(15),experience:z.string().max(160),summary:z.string().max(1800),caveat:z.string().max(600),url,checked:date,posted:date.nullable(),eligibility:z.string().min(2).max(400),degree:z.string().max(300)}).strict();

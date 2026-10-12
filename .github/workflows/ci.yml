@@ -1,4 +1,4 @@
-name: Verify Frontlane
+name: Verify FrontlaneJobs
 on: [push, pull_request]
 permissions:
   contents: read

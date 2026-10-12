@@ -1,5 +1,5 @@
 {
-  "name": "frontlane",
+  "name": "frontlanejobs",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,20 +8,20 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "pnpm --filter @frontlane/web dev",
-    "build": "pnpm --filter @frontlane/web build",
-    "start": "pnpm --filter @frontlane/web start",
-    "typecheck": "pnpm --filter @frontlane/web typecheck",
+    "dev": "pnpm --filter @frontlanejobs/web dev",
+    "build": "pnpm --filter @frontlanejobs/web build",
+    "start": "pnpm --filter @frontlanejobs/web start",
+    "typecheck": "pnpm --filter @frontlanejobs/web typecheck",
     "test": "node --test tests/*.test.mjs",
     "test:focused": "node --test tests/reliability.test.mjs tests/routes.test.mjs tests/monorepo.test.mjs tests/worker.test.mjs",
-    "db:migrate": "pnpm --filter @frontlane/database migrate",
+    "db:migrate": "pnpm --filter @frontlanejobs/database migrate",
     "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs",
-    "jobs:refresh": "pnpm --filter @frontlane/worker refresh",
+    "jobs:refresh": "pnpm --filter @frontlanejobs/worker refresh",
     "jobs:publish": "node --env-file-if-exists=.env.local apps/worker/scripts/publish-jobs.mjs"
   },
   "dependencies": {
-    "@frontlane/core": "workspace:*",
-    "@frontlane/database": "workspace:*"
+    "@frontlanejobs/core": "workspace:*",
+    "@frontlanejobs/database": "workspace:*"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",

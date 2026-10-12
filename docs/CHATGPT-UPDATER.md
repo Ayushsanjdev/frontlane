@@ -1,4 +1,4 @@
-# Publishing ChatGPT research into Frontlane
+# Publishing ChatGPT research into FrontlaneJobs
 
 The writer is `POST https://YOUR-DOMAIN/api/ingest/jobs`. Configure bearer authentication with INGEST_TOKEN in a supported connector or runner's secure credentials. The deployment must have the same token. Do not put it in a scheduled prompt. ChatGPT cannot push into an arbitrary deployment without that authenticated connection.
 

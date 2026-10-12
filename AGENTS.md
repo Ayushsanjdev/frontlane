@@ -1,7 +1,7 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-Frontlane is a pnpm monorepo using Next.js App Router, React, TypeScript, Tailwind CSS, and PostgreSQL. `apps/web/` contains pages, API routes, authentication, shared UI, and static assets. `apps/worker/` provides ingestion commands. `packages/core/` owns shared validation, queries, source adapters, and ingestion logic. `packages/database/` owns database access, SQL, migrations, and seed data. Root `scripts/` provides seed orchestration, `tests/` contains integration tests, and `docs/` contains operational documentation. Follow the scoped guidelines in `apps/web/AGENTS.md` and `packages/AGENTS.md`.
+FrontlaneJobs is a pnpm monorepo using Next.js App Router, React, TypeScript, Tailwind CSS, and PostgreSQL. `apps/web/` contains pages, API routes, authentication, shared UI, and static assets. `apps/worker/` provides ingestion commands. `packages/core/` owns shared validation, queries, source adapters, and ingestion logic. `packages/database/` owns database access, SQL, migrations, and seed data. Root `scripts/` provides seed orchestration, `tests/` contains integration tests, and `docs/` contains operational documentation. Follow the scoped guidelines in `apps/web/AGENTS.md` and `packages/AGENTS.md`.
 
 ## Build, Test, and Development Commands
 Use Node.js 22.13+ (`nvm use` selects Node 22) and the pnpm version pinned in `package.json`. Install from the repository root with `pnpm install --frozen-lockfile`. Keep `pnpm-lock.yaml` as the only lockfile.
@@ -16,7 +16,7 @@ Use Node.js 22.13+ (`nvm use` selects Node 22) and the pnpm version pinned in `p
 - `pnpm jobs:publish batch.json`: publish a validated research batch.
 
 ## Coding Style & Naming Conventions
-Keep TypeScript strict. Use `@/` imports within `apps/web/` and `@frontlane/core/*` or `@frontlane/database/*` exports across workspace boundaries. Use PascalCase for React components, camelCase for functions and variables, and lowercase kebab-case filenames. Follow Next.js names such as `page.tsx` and `route.ts`. For new multiline code, use two-space indentation; preserve surrounding quote and semicolon conventions. Existing application code is compact, while UI primitives use expanded formatting. No formatter or lint script is configured. Reuse shared UI components and Tailwind utilities.
+Keep TypeScript strict. Use `@/` imports within `apps/web/` and `@frontlanejobs/core/*` or `@frontlanejobs/database/*` exports across workspace boundaries. Use PascalCase for React components, camelCase for functions and variables, and lowercase kebab-case filenames. Follow Next.js names such as `page.tsx` and `route.ts`. For new multiline code, use two-space indentation; preserve surrounding quote and semicolon conventions. Existing application code is compact, while UI primitives use expanded formatting. No formatter or lint script is configured. Reuse shared UI components and Tailwind utilities.
 
 ## Testing Guidelines
 Name tests `tests/*.test.mjs`. Use `node:test`, strict assertions, and PGlite for database integration tests. Cover validation, replay conflicts, transactional behavior, source isolation, and private user access when changing related logic. No coverage threshold is configured. Run typecheck, tests, and build before submitting. For UI changes, check responsive layouts and themes manually.

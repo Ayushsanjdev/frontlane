@@ -1,4 +1,4 @@
-name: Refresh Frontlane employer feeds
+name: Refresh FrontlaneJobs employer feeds
 on:
   schedule:
     # Daily at 08:00 in India. GitHub may delay scheduled runs.

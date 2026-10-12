@@ -1,9 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {parseApplication,parseRemoval} from '@frontlane/core/tracker';
-import {filterSeedJobs,listJobs,getJob} from '@frontlane/core/jobs';
-import {loadProfile} from '@frontlane/core/profile';
-import {withRefreshLock} from '@frontlane/core/refresh';
+import {parseApplication,parseRemoval} from '@frontlanejobs/core/tracker';
+import {filterSeedJobs,listJobs,getJob} from '@frontlanejobs/core/jobs';
+import {loadProfile} from '@frontlanejobs/core/profile';
+import {withRefreshLock} from '@frontlanejobs/core/refresh';
 
 const job={id:'live-2',title:'Frontend Engineer',company:'Example',location:'India',mode:'Remote',type:'Full-time',salary:'Not disclosed',tags:['TypeScript'],experience:'3+ years',summary:'Product frontend',caveat:'Review hours',url:'https://example.com/jobs/2',source:'greenhouse:example',discovered:'2026-10-10',checked:'2026-10-11T09:00:00.000Z',posted:null,eligibility:'India eligible',degree:'Equivalent experience accepted'};
 const application={jobId:job.id,job,stage:'Saved'};

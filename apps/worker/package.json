@@ -1,5 +1,5 @@
 {
-  "name": "@frontlane/worker",
+  "name": "@frontlanejobs/worker",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -11,6 +11,6 @@
     "publish:jobs": "node --env-file-if-exists=../../.env.local scripts/publish-jobs.mjs"
   },
   "dependencies": {
-    "@frontlane/core": "workspace:*"
+    "@frontlanejobs/core": "workspace:*"
   }
 }

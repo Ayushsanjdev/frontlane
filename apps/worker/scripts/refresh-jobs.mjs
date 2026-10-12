@@ -1,4 +1,4 @@
-import {refreshSources,refreshSummary} from '@frontlane/core/sources';
+import {refreshSources,refreshSummary} from '@frontlanejobs/core/sources';
 
 const base=process.env.APP_URL,token=process.env.INGEST_TOKEN;
 if(!base||!token||token.length<32)throw Error('Set APP_URL and INGEST_TOKEN');

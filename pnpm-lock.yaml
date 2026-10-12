@@ -8,10 +8,10 @@ importers:
 
   .:
     dependencies:
-      '@frontlane/core':
+      '@frontlanejobs/core':
         specifier: workspace:*
         version: link:packages/core
-      '@frontlane/database':
+      '@frontlanejobs/database':
         specifier: workspace:*
         version: link:packages/database
     devDependencies:
@@ -27,10 +27,10 @@ importers:
 
   apps/web:
     dependencies:
-      '@frontlane/core':
+      '@frontlanejobs/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@frontlane/database':
+      '@frontlanejobs/database':
         specifier: workspace:*
         version: link:../../packages/database
       class-variance-authority:
@@ -94,13 +94,13 @@ importers:
 
   apps/worker:
     dependencies:
-      '@frontlane/core':
+      '@frontlanejobs/core':
         specifier: workspace:*
         version: link:../../packages/core
 
   packages/core:
     dependencies:
-      '@frontlane/database':
+      '@frontlanejobs/database':
         specifier: workspace:*
         version: link:../database
       zod:
