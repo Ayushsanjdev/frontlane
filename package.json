@@ -21,7 +21,9 @@
   },
   "dependencies": {
     "@frontlane/core": "workspace:*",
-    "@frontlane/database": "workspace:*"
+    "@frontlane/database": "workspace:*",
+    "@neon/config": "^1.8.6",
+    "@neon/env": "^1.5.3"
   },
   "devDependencies": {
     "@electric-sql/pglite": "^0.5.8",
