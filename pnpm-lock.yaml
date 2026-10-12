@@ -11,10 +11,10 @@ importers:
 
   .:
     dependencies:
-      '@frontlane/core':
+      '@frontlanejobs/core':
         specifier: workspace:*
         version: link:packages/core
-      '@frontlane/database':
+      '@frontlanejobs/database':
         specifier: workspace:*
         version: link:packages/database
     devDependencies:
@@ -36,10 +36,10 @@ importers:
       '@fontsource-variable/manrope':
         specifier: 5.3.0
         version: 5.3.0
-      '@frontlane/core':
+      '@frontlanejobs/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@frontlane/database':
+      '@frontlanejobs/database':
         specifier: workspace:*
         version: link:../../packages/database
       '@lucide/svelte':
@@ -91,13 +91,13 @@ importers:
 
   apps/worker:
     dependencies:
-      '@frontlane/core':
+      '@frontlanejobs/core':
         specifier: workspace:*
         version: link:../../packages/core
 
   packages/core:
     dependencies:
-      '@frontlane/database':
+      '@frontlanejobs/database':
         specifier: workspace:*
         version: link:../database
       zod:

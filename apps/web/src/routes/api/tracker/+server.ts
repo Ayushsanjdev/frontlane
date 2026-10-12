@@ -1,7 +1,7 @@
 import type {RequestEvent} from '@sveltejs/kit';
 import {randomUUID} from 'node:crypto';
-import {database} from '@frontlane/database/client';
-import {parseApplication,parseRemoval} from '@frontlane/core/tracker';
+import {database} from '@frontlanejobs/database/client';
+import {parseApplication,parseRemoval} from '@frontlanejobs/core/tracker';
 import {identity,failure,boundedJson} from '$lib/server/auth-api';
 
 export async function GET({request,locals}:RequestEvent){

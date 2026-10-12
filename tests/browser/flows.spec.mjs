@@ -8,7 +8,7 @@ const origin='http://localhost:4173';
 
 async function signIn(context,id='browser-alice'){
   const name='authjs.session-token';
-  const value=await encode({secret:'frontlane-browser-test-secret-never-for-production',salt:name,token:{sub:id,userId:'google:'+id,name:'Asha Rao',email:id+'@example.test'},maxAge:3600});
+  const value=await encode({secret:'frontlanejobs-browser-test-secret-never-for-production',salt:name,token:{sub:id,userId:'google:'+id,name:'Asha Rao',email:id+'@example.test'},maxAge:3600});
   await context.addCookies([{name,value,url:origin,httpOnly:true,sameSite:'Lax'}]);
 }
 async function ready(page){await expect(page.getByRole('combobox',{name:'Color theme'})).toBeEnabled()}

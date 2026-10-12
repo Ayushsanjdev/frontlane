@@ -58,12 +58,12 @@
   }
   function exportCsv() {
     const url = URL.createObjectURL(new Blob([trackerCsv(items)], {type: 'text/csv;charset=utf-8;'}));
-    const link = document.createElement('a'); link.href = url; link.download = 'Frontlane-Application-Tracker.csv'; link.click();
+    const link = document.createElement('a'); link.href = url; link.download = 'frontlanejobs-Application-Tracker.csv'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 </script>
 
-<svelte:head><title>Your application tracker — Frontlane</title></svelte:head>
+<svelte:head><title>Your application tracker — frontlanejobs</title></svelte:head>
 <section class="wrap tracker-page">
   <div class="page-heading"><div><span class="section-label"><ShieldCheck size={15} />Your private workspace</span><h1>A little more organised.</h1><p>Hey {data.user?.displayName.split(' ')[0] || 'there'}, keep your next steps together.</p></div><div class="button-row"><button class="button secondary" disabled={!items.length} onclick={exportCsv}><Download size={17} />Export CSV</button><button class="button" disabled={!!data.loadError} onclick={add}><Plus size={18} />Add a job</button></div></div>
   {#if data.loadError}<div class="empty-state"><h2>Your tracker is temporarily unavailable.</h2><p role="alert">{data.loadError}</p><a class="button secondary" href="/tracker" data-sveltekit-reload>Try again</a></div>

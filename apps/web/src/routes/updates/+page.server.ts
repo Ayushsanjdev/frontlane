@@ -1,4 +1,4 @@
-import {database} from '@frontlane/database/client';
+import {database} from '@frontlanejobs/database/client';
 
 type SourceCheck = {source: string; status: string; matched: number; checked_at: Date | string};
 

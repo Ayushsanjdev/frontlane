@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-  <title>Frontlane — Your next frontend move</title>
+  <title>frontlanejobs — Your next frontend move</title>
   <meta name="description" content="Frontend jobs for India. Discover a role, find freelance work, and organise your applications in a private workspace." />
   <meta name="theme-color" content="#2457d6" />
 </svelte:head>
@@ -18,7 +18,7 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <header class="site-header">
   <div class="nav-inner">
-    <a class="brand" href="/" aria-label="Frontlane home"><span class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i></span>frontlane<span class="brand-period">.</span></a>
+    <a class="brand" href="/" aria-label="frontlanejobs home"><span class="brand-symbol" aria-hidden="true"><i></i><i></i><i></i></span>frontlanejobs<span class="brand-period">.</span></a>
     <nav aria-label="Main navigation">
       <a class:active={page.url.pathname === '/jobs' && page.url.searchParams.get('type') !== 'Freelance'} href="/jobs">Find jobs</a>
       <a class:active={page.url.pathname === '/jobs' && page.url.searchParams.get('type') === 'Freelance'} href="/jobs?type=Freelance">Freelance</a>
@@ -37,6 +37,6 @@
 </header>
 <main id="main">{@render children()}</main>
 <footer class="site-footer">
-  <div class="footer-top"><div><a class="brand" href="/">frontlane<span class="brand-period">.</span></a><p>A clearer path to your next frontend role.</p></div><div class="footer-links"><a href="/about">How it works & privacy</a><a href="/updates">Source status <ArrowRight size={14} /></a></div></div>
+  <div class="footer-top"><div><a class="brand" href="/">frontlanejobs<span class="brand-period">.</span></a><p>A clearer path to your next frontend role.</p></div><div class="footer-links"><a href="/about">How it works & privacy</a><a href="/updates">Source status <ArrowRight size={14} /></a></div></div>
   <div class="footer-bottom"><ViewerCounts /><p>Independent job discovery. Apply directly to employers.</p></div>
 </footer>

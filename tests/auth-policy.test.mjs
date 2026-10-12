@@ -17,8 +17,8 @@ test('Google sign-in requires a verified email and preserves existing account ow
   assert.equal((await authCallbacks.jwt({token,account:null})).userId,'google:12345');
 });
 test('authentication redirects stay on the application origin',async()=>{
-  const baseUrl='https://frontlane.example';
-  for(const url of ['https://evil.example','//evil.example','/\\evil.example','https://frontlane.example.evil.example','/jobs\n']){
+  const baseUrl='https://frontlanejobs.example';
+  for(const url of ['https://evil.example','//evil.example','/\\evil.example','https://frontlanejobs.example.evil.example','/jobs\n']){
     assert.equal(await authCallbacks.redirect({url,baseUrl}),baseUrl+'/tracker');
   }
   assert.equal(await authCallbacks.redirect({url:'/jobs?job=abc',baseUrl}),baseUrl+'/jobs?job=abc');

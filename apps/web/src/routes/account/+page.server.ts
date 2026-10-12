@@ -1,5 +1,5 @@
-import {database} from '@frontlane/database/client';
-import {loadProfile} from '@frontlane/core/profile';
+import {database} from '@frontlanejobs/database/client';
+import {loadProfile} from '@frontlanejobs/core/profile';
 import {requireUser} from '$lib/server/session';
 import type {PageServerLoad} from './$types';
 

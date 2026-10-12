@@ -1,4 +1,4 @@
-import data from '@frontlane/database/seed';
+import data from '@frontlanejobs/database/seed';
 import type {Job} from '../types';
 
 // The database seed and public fallback share one curated dataset.

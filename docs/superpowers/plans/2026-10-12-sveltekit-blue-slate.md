@@ -2,7 +2,7 @@
 
 > **For agentic workers:** Use superpowers:executing-plans to implement this plan task by task. Steps use checkbox syntax for tracking.
 
-**Goal:** Replace Frontlane's Next.js web app with SvelteKit and redesign every page in blue and slate.
+**Goal:** Replace frontlanejobs's Next.js web app with SvelteKit and redesign every page in blue and slate.
 
 **Architecture:** Keep the core/database packages and JSON API contracts. Move request handling to SvelteKit events, server data to server-only modules, and UI to Svelte components with shared tokens.
 
@@ -15,7 +15,7 @@
 - Keep pnpm workspaces and `pnpm-lock.yaml` as the only lockfile.
 - Preserve strict TypeScript and the public URL/API contracts.
 - Preserve private account ownership and `google:<providerAccountId>` identities.
-- Persist the existing `frontlane-theme` preference.
+- Persist the existing `frontlanejobs-theme` preference.
 - Preserve third-party license files and root `.env.local` loading.
 - Execute inline on the requested feature branch. The user's “do it” authorizes implementation of the presented design.
 

@@ -8,8 +8,8 @@ Run commands from the repository root: `pnpm dev`, `pnpm build`,
 `pnpm typecheck`, `pnpm test`, and `pnpm test:browser`. Install with
 `pnpm install --frozen-lockfile`. Local web commands load the root `.env.local`.
 
-Import shared logic through `@frontlane/core/*` and database exports through
-`@frontlane/database/*`. Keep database imports in server-only modules. Keep
+Import shared logic through `@frontlanejobs/core/*` and database exports through
+`@frontlanejobs/database/*`. Keep database imports in server-only modules. Keep
 authentication here; ingestion, validation and query logic belong in `packages/core/`.
 
 Use Svelte 5 runes, strict TypeScript, two-space indentation, generated route
@@ -18,7 +18,7 @@ request events; identities must come from request-local sessions. Protect each
 private page load and API handler individually. Preserve JSON endpoint contracts
 and the Google OAuth callback at `/api/auth/callback/google`.
 
-Add dependencies to this workspace with `pnpm --filter @frontlane/web add <package>`.
+Add dependencies to this workspace with `pnpm --filter @frontlanejobs/web add <package>`.
 SvelteKit and its adapters must remain compatible with Auth.js peer requirements.
 Use Vite integration for Tailwind. Normal builds use the Node adapter; Vercel
 builds use the Vercel adapter. Keep third-party licenses in `vendor/`.

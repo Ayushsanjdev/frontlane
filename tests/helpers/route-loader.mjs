@@ -24,10 +24,10 @@ export async function load(url,context,next){
   // Only external session and PostgreSQL boundaries are replaced. Handlers,
   // origin checks, validation, query construction and cleanup execute normally.
   if(url===pathToFileURL(pathResolve(root,'lib/server/session.ts')).href){
-    return {format:'module',source:'export async function getUser(locals){return locals?.user===undefined?globalThis.__frontlaneRouteTest.user:locals.user}',shortCircuit:true};
+    return {format:'module',source:'export async function getUser(locals){return locals?.user===undefined?globalThis.__frontlanejobsRouteTest.user:locals.user}',shortCircuit:true};
   }
   if(url===pathToFileURL(pathResolve(workspace,'packages/database/src/client.mjs')).href){
-    return {format:'module',source:'export function database(){return globalThis.__frontlaneRouteTest.db}',shortCircuit:true};
+    return {format:'module',source:'export function database(){return globalThis.__frontlanejobsRouteTest.db}',shortCircuit:true};
   }
   if(url.endsWith('.json'))return {format:'module',source:'export default '+await readFile(new URL(url),'utf8'),shortCircuit:true};
   if(url.endsWith('.ts')){

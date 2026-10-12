@@ -7,11 +7,11 @@
 
   function apply() {
     document.documentElement.classList.toggle('dark', theme === 'dark' || (theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches));
-    try { localStorage.setItem('frontlane-theme', theme); } catch {}
+    try { localStorage.setItem('frontlanejobs-theme', theme); } catch {}
   }
 
   onMount(() => {
-    try { theme = localStorage.getItem('frontlane-theme') || 'system'; } catch {}
+    try { theme = localStorage.getItem('frontlanejobs-theme') || 'system'; } catch {}
     if (!['light', 'dark', 'system'].includes(theme)) theme = 'system';
     ready = true;
     apply();

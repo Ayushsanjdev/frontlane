@@ -1,5 +1,5 @@
 {
-  "name": "@frontlane/web",
+  "name": "@frontlanejobs/web",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -17,8 +17,8 @@
   "dependencies": {
     "@auth/sveltekit": "1.11.3",
     "@fontsource-variable/manrope": "5.3.0",
-    "@frontlane/core": "workspace:*",
-    "@frontlane/database": "workspace:*",
+    "@frontlanejobs/core": "workspace:*",
+    "@frontlanejobs/database": "workspace:*",
     "@lucide/svelte": "1.55.0",
     "zod": "^3.25.76"
   },

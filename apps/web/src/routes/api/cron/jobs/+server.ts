@@ -1,8 +1,8 @@
 import type {RequestEvent} from '@sveltejs/kit';
-import {authorized,ingest} from '@frontlane/core/ingestion';
-import {refreshSources,refreshSummary} from '@frontlane/core/sources';
-import {withRefreshLock} from '@frontlane/core/refresh';
-import {database} from '@frontlane/database/client';
+import {authorized,ingest} from '@frontlanejobs/core/ingestion';
+import {refreshSources,refreshSummary} from '@frontlanejobs/core/sources';
+import {withRefreshLock} from '@frontlanejobs/core/refresh';
+import {database} from '@frontlanejobs/database/client';
 import type {PoolClient} from 'pg';
 
 export const config={maxDuration:300};

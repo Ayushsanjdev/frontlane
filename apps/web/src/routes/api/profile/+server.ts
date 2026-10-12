@@ -1,6 +1,6 @@
 import type {RequestEvent} from '@sveltejs/kit';
-import {database} from '@frontlane/database/client';
-import {loadProfile,ProfileInput} from '@frontlane/core/profile';
+import {database} from '@frontlanejobs/database/client';
+import {loadProfile,ProfileInput} from '@frontlanejobs/core/profile';
 import {identity,failure,boundedJson} from '$lib/server/auth-api';
 
 export async function GET({request,locals}:RequestEvent){

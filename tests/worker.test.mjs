@@ -10,7 +10,7 @@ const worker=fileURLToPath(new URL('../apps/worker/scripts/publish-jobs.mjs',imp
 const preload=fileURLToPath(new URL('./helpers/worker-fetch.mjs',import.meta.url));
 test('production refresh worker publishes 50 jobs and emits a summary',()=>{
  const result=spawnSync(process.execPath,['--import',fileURLToPath(new URL('./helpers/refresh-fetch.mjs',import.meta.url)),fileURLToPath(new URL('../apps/worker/scripts/refresh-jobs.mjs',import.meta.url))],{
-  env:{...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'false'},encoding:'utf8',timeout:10000,
+  env:{...process.env,APP_URL:'https://frontlanejobs.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'false'},encoding:'utf8',timeout:10000,
  });
  assert.equal(result.status,0,result.stderr);
  assert.deepEqual(JSON.parse(result.stdout).summary,{target:50,published:50,shortfall:0,failedSources:0});
@@ -18,7 +18,7 @@ test('production refresh worker publishes 50 jobs and emits a summary',()=>{
 
 test('production refresh worker exits unsuccessfully when all employers fail',()=>{
  const result=spawnSync(process.execPath,['--import',fileURLToPath(new URL('./helpers/refresh-fetch.mjs',import.meta.url)),fileURLToPath(new URL('../apps/worker/scripts/refresh-jobs.mjs',import.meta.url))],{
-  env:{...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'true'},encoding:'utf8',timeout:10000,
+  env:{...process.env,APP_URL:'https://frontlanejobs.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'true'},encoding:'utf8',timeout:10000,
  });
  assert.equal(result.status,1);
  assert.equal(JSON.parse(result.stdout).summary.shortfall,50);
@@ -26,10 +26,10 @@ test('production refresh worker exits unsuccessfully when all employers fail',()
 });
 for(const useInvokingDirectory of [false,true]){
  test('worker publishes a relative batch from '+(useInvokingDirectory?'pnpm INIT_CWD':'the current directory'),async()=>{
-  const directory=await mkdtemp(join(tmpdir(),'frontlane-worker-'));
+  const directory=await mkdtemp(join(tmpdir(),'frontlanejobs-worker-'));
   try{
    await writeFile(join(directory,'batch.json'),JSON.stringify({source:'research:fixture',runId:'workspace-fixture',jobs:[]}));
-   const env={...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'worker-fixture-token'};
+   const env={...process.env,APP_URL:'https://frontlanejobs.example',INGEST_TOKEN:'worker-fixture-token'};
    delete env.INIT_CWD;
    if(useInvokingDirectory)env.INIT_CWD=directory;
    const result=spawnSync(process.execPath,['--import',preload,worker,'batch.json'],{

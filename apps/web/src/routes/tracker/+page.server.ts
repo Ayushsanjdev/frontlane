@@ -1,4 +1,4 @@
-import {database} from '@frontlane/database/client';
+import {database} from '@frontlanejobs/database/client';
 import {requireUser} from '$lib/server/session';
 import type {Application} from '$lib/types';
 import type {PageServerLoad} from './$types';

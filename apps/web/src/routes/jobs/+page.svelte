@@ -112,7 +112,7 @@
   }
 </script>
 
-<svelte:head><title>Frontend jobs for India — Frontlane</title></svelte:head>
+<svelte:head><title>Frontend jobs for India — frontlanejobs</title></svelte:head>
 <section class="wrap board-page">
   <div class="page-heading"><div><span class="section-label">Find your next move</span><h1>Good work starts here.</h1><p>Frontend opportunities for India, with the details that matter.</p></div><span class="heading-note"><ShieldCheck size={16} />Direct application links</span></div>
   <div class="board-search"><Search size={21} /><input aria-label="Search jobs" type="search" bind:value={query} oninput={() => { page = 1; }} placeholder="Role, company, technology or city" /><span>Make room for your next role</span></div>

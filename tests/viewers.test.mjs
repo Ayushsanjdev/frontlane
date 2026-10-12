@@ -6,11 +6,11 @@ import {PGlite} from '@electric-sql/pglite';
 
 register('./helpers/route-loader.mjs',import.meta.url);
 const pg=new PGlite();
-before(async()=>pg.exec(await readFile(new URL(import.meta.resolve('@frontlane/database/schema')),'utf8')));
+before(async()=>pg.exec(await readFile(new URL(import.meta.resolve('@frontlanejobs/database/schema')),'utf8')));
 after(()=>pg.close());
 beforeEach(async()=>{
   process.env.APP_URL='http://localhost:3000';
-  globalThis.__frontlaneRouteTest={db:pg};
+  globalThis.__frontlanejobsRouteTest={db:pg};
   await pg.query('DELETE FROM viewers');
 });
 
@@ -44,10 +44,10 @@ test('expired viewers leave the current count while lifetime totals survive',asy
   await POST(heartbeat());
   await POST(heartbeat());
   await pg.query("UPDATE viewers SET last_seen_at=now()-interval '91 seconds'");
-  const returning=await POST(heartbeat('frontlane_viewer=00000000-0000-4000-8000-000000000001'));
+  const returning=await POST(heartbeat('frontlanejobs_viewer=00000000-0000-4000-8000-000000000001'));
   assert.deepEqual(await returning.json(),{total:3,current:1});
   await pg.query("UPDATE viewers SET last_seen_at=now()-interval '89 seconds' WHERE id<>$1",['00000000-0000-4000-8000-000000000001']);
-  const next=await POST(heartbeat('frontlane_viewer=00000000-0000-4000-8000-000000000001'));
+  const next=await POST(heartbeat('frontlanejobs_viewer=00000000-0000-4000-8000-000000000001'));
   assert.deepEqual(await next.json(),{total:3,current:3});
 });
 
@@ -89,7 +89,7 @@ test('simultaneous first visits share the browser cookie before counting a secon
 test('cross-origin or missing-origin heartbeats never write visitor records',async()=>{
   const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
   const POST=request=>handler({request,url:new URL(request.url),locals:{}});
-  globalThis.__frontlaneRouteTest.db={query:()=>assert.fail('must reject before database access')};
+  globalThis.__frontlanejobsRouteTest.db={query:()=>assert.fail('must reject before database access')};
   assert.equal((await POST(heartbeat(undefined,'https://other.example'))).status,403);
   assert.equal((await POST(new Request('http://localhost:3000/api/viewers',{method:'POST'}))).status,403);
 });
@@ -97,10 +97,10 @@ test('cross-origin or missing-origin heartbeats never write visitor records',asy
 test('database outages return unavailable counts and malformed cookies are replaced',async()=>{
   const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
   const POST=request=>handler({request,url:new URL(request.url),locals:{}});
-  const replaced=await POST(heartbeat('frontlane_viewer=invalid'));
+  const replaced=await POST(heartbeat('frontlanejobs_viewer=invalid'));
   assert.equal(replaced.status,200);
-  assert.match(replaced.headers.get('set-cookie'),/frontlane_viewer=[0-9a-f-]{36};/);
-  globalThis.__frontlaneRouteTest.db={query:async()=>{throw Error('offline')}};
+  assert.match(replaced.headers.get('set-cookie'),/frontlanejobs_viewer=[0-9a-f-]{36};/);
+  globalThis.__frontlanejobsRouteTest.db={query:async()=>{throw Error('offline')}};
   const unavailable=await POST(heartbeat());
   assert.equal(unavailable.status,503);
   assert.equal(unavailable.headers.get('cache-control'),'no-store');

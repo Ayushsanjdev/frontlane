@@ -1,4 +1,4 @@
-# Frontlane SvelteKit migration and blue/slate redesign
+# frontlanejobs SvelteKit migration and blue/slate redesign
 
 Status: approved and implemented on `feat/sveltekit-blue-slate`.
 
@@ -58,7 +58,7 @@ page retrieval, and API helpers. Shared public types stay in `src/lib/types.ts`.
 Static assets move to `apps/web/static`.
 
 Use SvelteKit's `$lib` alias inside the web workspace and preserve workspace
-package exports for `@frontlane/core/*` and `@frontlane/database/*`. Database
+package exports for `@frontlanejobs/core/*` and `@frontlanejobs/database/*`. Database
 imports must remain in server-only modules. Do not serialize authentication
 secrets, database connection strings, or another user's records into page data.
 
@@ -115,7 +115,7 @@ supporting surfaces quiet: modest radii, restrained shadows, useful dividers,
 and consistent spacing. Avoid repeating identical cards for every content type.
 Make important actions visibly clickable and provide generous touch targets.
 
-Persist the existing `frontlane-theme` preference, respect system changes, and
+Persist the existing `frontlanejobs-theme` preference, respect system changes, and
 apply the theme before first paint. Both themes must cover dialogs, native form
 controls, tables, empty states, and error states. Respect reduced motion and
 retain the skip link and visible keyboard focus.

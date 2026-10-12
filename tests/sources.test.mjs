@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import * as adapters from '@frontlane/core/sources';
-import {Batch} from '@frontlane/core/ingestion';
+import * as adapters from '@frontlanejobs/core/sources';
+import {Batch} from '@frontlanejobs/core/ingestion';
 
 const sources=[['greenhouse','alpha','Alpha'],['lever','beta','Beta'],['lever','gamma','Gamma']];
 const greenhouse=(id,patch={})=>({id,title:'Frontend Engineer',location:{name:'Bengaluru, India'},content:'Build React and TypeScript interfaces.',absolute_url:`https://careers.alpha.example/jobs/${id}`,metadata:[],...patch});
@@ -89,9 +89,9 @@ test('eligibility recognizes UI developers and rejects unrelated or geographical
 test('refresh replaces the daily selection transactionally and preserves failed and research sources',async t=>{
   const {readFile}=await import('node:fs/promises');
   const {PGlite}=await import('@electric-sql/pglite');
-  const {ingest}=await import('@frontlane/core/ingestion');
+  const {ingest}=await import('@frontlanejobs/core/ingestion');
   const pg=new PGlite();
-  await pg.exec(await readFile(new URL(import.meta.resolve('@frontlane/database/schema')),'utf8'));
+  await pg.exec(await readFile(new URL(import.meta.resolve('@frontlanejobs/database/schema')),'utf8'));
   const db={connect:async()=>({query:(...args)=>pg.query(...args),release(){}})};
   const fixture={requisitionId:'old',title:'Frontend Engineer',company:'Old',location:'India',mode:'Remote',type:'Full-time',salary:'Not disclosed',tags:['React'],experience:'See employer requirements',summary:'React',caveat:'',url:'https://careers.example/old',checked:new Date().toISOString(),posted:null,eligibility:'India',degree:''};
   try{

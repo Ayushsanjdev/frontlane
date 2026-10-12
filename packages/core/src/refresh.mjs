@@ -3,7 +3,7 @@ export async function withRefreshLock(db,refresh){
   let finished=false,discard=false;
   try{
     await client.query('BEGIN');
-    const lock=await client.query("SELECT pg_try_advisory_xact_lock(hashtext('frontlane-refresh')) AS locked");
+    const lock=await client.query("SELECT pg_try_advisory_xact_lock(hashtext('frontlanejobs-refresh')) AS locked");
     if(!lock.rows[0].locked){
       await client.query('ROLLBACK');finished=true;
       return {skipped:'Refresh already running'};

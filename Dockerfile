@@ -12,13 +12,13 @@ RUN pnpm install --frozen-lockfile
 FROM deps AS build
 COPY . .
 RUN pnpm build
-RUN pnpm --filter @frontlane/web deploy --prod --legacy /runtime
+RUN pnpm --filter @frontlanejobs/web deploy --prod --legacy /runtime
 
 FROM node:22-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
-RUN addgroup -S frontlane && adduser -S frontlane -G frontlane
-COPY --from=build --chown=frontlane:frontlane /runtime ./
-USER frontlane
+RUN addgroup -S frontlanejobs && adduser -S frontlanejobs -G frontlanejobs
+COPY --from=build --chown=frontlanejobs:frontlanejobs /runtime ./
+USER frontlanejobs
 EXPOSE 3000
 CMD ["node", "--import", "./scripts/load-env.mjs", "build/index.js"]

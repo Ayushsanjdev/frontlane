@@ -1,10 +1,10 @@
 import type {RequestEvent} from '@sveltejs/kit';
 import {randomUUID} from 'node:crypto';
-import {database} from '@frontlane/database/client';
-import {recordViewer} from '@frontlane/core/viewers';
+import {database} from '@frontlanejobs/database/client';
+import {recordViewer} from '@frontlanejobs/core/viewers';
 
 
-const cookieName='frontlane_viewer';
+const cookieName='frontlanejobs_viewer';
 
 export async function POST({request,locals}:RequestEvent){
   const expected=new URL(process.env.APP_URL||request.url);

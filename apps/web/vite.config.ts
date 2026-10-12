@@ -6,5 +6,5 @@ export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   envDir: '../..',
   server: {port: 3000, strictPort: true},
-  ssr: {noExternal: ['@frontlane/core', '@frontlane/database']}
+  ssr: {noExternal: ['@frontlanejobs/core', '@frontlanejobs/database']}
 });

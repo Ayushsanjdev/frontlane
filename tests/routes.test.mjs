@@ -2,7 +2,7 @@ import {test,beforeEach} from 'node:test';
 import assert from 'node:assert/strict';
 import {register} from 'node:module';
 register('./helpers/route-loader.mjs',import.meta.url);
-const {SOURCES}=await import('@frontlane/core/sources');
+const {SOURCES}=await import('@frontlanejobs/core/sources');
 const route=async path=>{
  const handlers=await import('../apps/web/src/routes/api/'+path+'/+server.ts');
  return Object.fromEntries(Object.entries(handlers).filter(([,handler])=>typeof handler==='function').map(([method,handler])=>[method,(request,locals={})=>handler({request,url:new URL(request.url),locals})]));
@@ -15,19 +15,19 @@ function request(path,body,origin='http://localhost:3000'){
 }
 beforeEach(()=>{
  process.env.APP_URL='http://localhost:3000';
- globalThis.__frontlaneRouteTest={user,db:{query:async()=>{assert.fail('unexpected database access')}}};
+ globalThis.__frontlanejobsRouteTest={user,db:{query:async()=>{assert.fail('unexpected database access')}}};
 });
 test('private routes reject unsigned reads and cross-origin writes before accessing the database',async()=>{
- globalThis.__frontlaneRouteTest.user=null;
+ globalThis.__frontlanejobsRouteTest.user=null;
  assert.equal((await tracker.GET(new Request('http://localhost:3000/api/tracker'))).status,401);
  assert.equal((await profile.GET(new Request('http://localhost:3000/api/profile'))).status,401);
- globalThis.__frontlaneRouteTest.user=user;
+ globalThis.__frontlanejobsRouteTest.user=user;
  assert.equal((await tracker.POST(request('tracker',{},'https://other.example'))).status,403);
  assert.equal((await profile.POST(request('profile',{},'https://other.example'))).status,403);
 });
 test('tracker rejects malformed nested values and invalid calendar dates before persistence',async()=>{
  // A malformed payload must not be repaired into a different value and saved.
- globalThis.__frontlaneRouteTest.db={query:async(_sql,args)=>({rows:[{payload:args[3]}]})};
+ globalThis.__frontlanejobsRouteTest.db={query:async(_sql,args)=>({rows:[{payload:args[3]}]})};
  for(const patch of [{job:{...job,company:{name:'Example'}}},{job:{...job,tags:'TypeScript'}},{followUp:'2026-02-30'}]){
   const response=await tracker.POST(request('tracker',{job,jobId:job.id,stage:'Saved',...patch}));
   assert.equal(response.status,400);
@@ -35,7 +35,7 @@ test('tracker rejects malformed nested values and invalid calendar dates before 
 });
 test('tracker read, write and delete queries are scoped to the authenticated user',async()=>{
  const id='00000000-0000-4000-8000-000000000001';
- globalThis.__frontlaneRouteTest.db={query:async(sql,args)=>{
+ globalThis.__frontlanejobsRouteTest.db={query:async(sql,args)=>{
   if(sql.startsWith('INSERT')){
    assert.equal(args[1],'alice');
    assert.equal(args[3].job.company,'Example');
@@ -53,11 +53,11 @@ test('tracker read, write and delete queries are scoped to the authenticated use
  assert.equal(deleted.status,200);
 });
 test('profile rejects non-string fields rather than coercing them into stored values',async()=>{
- globalThis.__frontlaneRouteTest.db={query:async()=>({rows:[]})};
+ globalThis.__frontlanejobsRouteTest.db={query:async()=>({rows:[]})};
  assert.equal((await profile.POST(request('profile',{name:{unexpected:'object'}}))).status,400);
 });
 test('job ID endpoint returns a live job outside the first list page and 404 for missing jobs',async()=>{
- globalThis.__frontlaneRouteTest.db={query:async(sql,args)=>{
+ globalThis.__frontlanejobsRouteTest.db={query:async(sql,args)=>{
   assert.match(sql,/active=true AND id=\$1/);
   return {rows:args[0]==='live-2'?[{payload:job}]:[]};
  }};
@@ -73,7 +73,7 @@ test('cron processes sources on one connection and releases it after commit',asy
   calls.push(sql);
   return {rows:sql.includes('pg_try_advisory_xact_lock')?[{locked:true}]:[]};
  },release:()=>calls.push('release')};
- globalThis.__frontlaneRouteTest.db={connect:async()=>{
+ globalThis.__frontlanejobsRouteTest.db={connect:async()=>{
   connects++;assert.equal(connects,1,'must reuse the lock connection');return client;
  },query:async()=>assert.fail('must use lock connection for status writes')};
  const original=globalThis.fetch;
@@ -92,7 +92,7 @@ test('cron processes sources on one connection and releases it after commit',asy
 test('cron reports total source failure to the production scheduler',async()=>{
  process.env.CRON_SECRET='c'.repeat(32);
  const client={query:async sql=>({rows:sql.includes('pg_try_advisory_xact_lock')?[{locked:true}]:[]}),release(){}};
- globalThis.__frontlaneRouteTest.db={connect:async()=>client};
+ globalThis.__frontlanejobsRouteTest.db={connect:async()=>client};
  const original=globalThis.fetch;
  globalThis.fetch=async()=>({ok:false,status:503});
  try{
@@ -104,9 +104,9 @@ test('cron reports total source failure to the production scheduler',async()=>{
 
 test('curated fallback metadata preserves job IDs and validates for tracker and ingestion',async()=>{
  const {readFile}=await import('node:fs/promises');
- const {parseApplication}=await import('@frontlane/core/tracker');
- const {Batch}=await import('@frontlane/core/ingestion');
- const data=JSON.parse(await readFile(new URL(import.meta.resolve('@frontlane/database/seed')),'utf8'));
+ const {parseApplication}=await import('@frontlanejobs/core/tracker');
+ const {Batch}=await import('@frontlanejobs/core/ingestion');
+ const data=JSON.parse(await readFile(new URL(import.meta.resolve('@frontlanejobs/database/seed')),'utf8'));
  assert.equal(data[0].id,'a70bef7354d47ad6aa6f2ccc0e62dd9fd393e91984173336610cdb04247fb7ef');
  for(const {requisitionId,...job} of data)assert.equal(parseApplication({job,stage:'Saved'}).jobId,job.id);
  const jobs=data.map(({id,source,discovered,...input})=>input);
@@ -114,11 +114,11 @@ test('curated fallback metadata preserves job IDs and validates for tracker and 
 });
 test('job collection distinguishes an empty live feed from an unavailable database',async()=>{
  const {jobCollection}=await import('../apps/web/src/lib/server/jobs.ts');
- globalThis.__frontlaneRouteTest.db={query:async(sql)=>({rows:sql.includes('count(*)')?[{total:0}]:sql.includes('max(completed_at)')?[{last:null}]:[]})};
+ globalThis.__frontlanejobsRouteTest.db={query:async(sql)=>({rows:sql.includes('count(*)')?[{total:0}]:sql.includes('max(completed_at)')?[{last:null}]:[]})};
  const live=await jobCollection(new URLSearchParams({limit:'3'}));
  assert.equal(live.jobs.length,0);
  assert.equal(live.warning,undefined);
- globalThis.__frontlaneRouteTest.db={query:async()=>{throw Error('offline')}};
+ globalThis.__frontlanejobsRouteTest.db={query:async()=>{throw Error('offline')}};
  const fallback=await jobCollection(new URLSearchParams({limit:'3'}));
  assert.equal(fallback.jobs.length,3);
  assert.ok(fallback.warning);
@@ -128,7 +128,7 @@ test('status endpoint records a failed SmartRecruiters feed',async()=>{
  process.env.INGEST_TOKEN='i'.repeat(32);
  const status=await route('ingest/status');
  const recorded=[];
- globalThis.__frontlaneRouteTest.db={query:async(_sql,args)=>{recorded.push(args[0]);return {rows:[]}}};
+ globalThis.__frontlanejobsRouteTest.db={query:async(_sql,args)=>{recorded.push(args[0]);return {rows:[]}}};
  const response=await status.POST(new Request('http://localhost:3000/api/ingest/status',{method:'POST',headers:{authorization:'Bearer '+'i'.repeat(32),'Content-Type':'application/json'},body:JSON.stringify(['smartrecruiters:nagarro1'])}));
  assert.equal(response.status,200);
  assert.deepEqual(recorded,['smartrecruiters:nagarro1']);
@@ -137,7 +137,7 @@ test('status endpoint records a failed SmartRecruiters feed',async()=>{
 // Removing the per-request identity or replacing it with shared state must fail this test.
 test('concurrent tracker requests keep their own authenticated identity',async()=>{
  const ids=[];
- globalThis.__frontlaneRouteTest.db={query:async(_sql,args)=>{
+ globalThis.__frontlanejobsRouteTest.db={query:async(_sql,args)=>{
   await new Promise(resolve=>setImmediate(resolve));
   ids.push(args[0]);
   return {rows:[{payload:{owner:args[0]}}]};
