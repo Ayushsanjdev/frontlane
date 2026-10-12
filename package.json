@@ -17,7 +17,8 @@
     "db:migrate": "pnpm --filter @frontlane/database migrate",
     "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs",
     "jobs:refresh": "pnpm --filter @frontlane/worker refresh",
-    "jobs:publish": "node --env-file-if-exists=.env.local apps/worker/scripts/publish-jobs.mjs"
+    "jobs:publish": "node --env-file-if-exists=.env.local apps/worker/scripts/publish-jobs.mjs",
+    "test:browser": "pnpm --filter @frontlane/web test:browser"
   },
   "dependencies": {
     "@frontlane/core": "workspace:*",

@@ -4,10 +4,10 @@ import {resolve as pathResolve} from 'node:path';
 import ts from 'typescript';
 
 const workspace=fileURLToPath(new URL('../../',import.meta.url));
-const root=pathResolve(workspace,'apps/web');
+const root=pathResolve(workspace,'apps/web/src');
 export async function resolve(specifier,context,next){
-  if(specifier.startsWith('@/')){
-    const path=pathResolve(root,specifier.slice(2));
+  if(specifier.startsWith('$lib/')){
+    const path=pathResolve(root,'lib',specifier.slice(5));
     for(const suffix of ['', '.ts','.tsx','.mjs']){
       try{await access(path+suffix);return {url:pathToFileURL(path+suffix).href,shortCircuit:true}}catch{}
     }
@@ -23,8 +23,8 @@ export async function resolve(specifier,context,next){
 export async function load(url,context,next){
   // Only external session and PostgreSQL boundaries are replaced. Handlers,
   // origin checks, validation, query construction and cleanup execute normally.
-  if(url===pathToFileURL(pathResolve(root,'lib/session.ts')).href){
-    return {format:'module',source:'export async function getUser(){return globalThis.__frontlaneRouteTest.user}',shortCircuit:true};
+  if(url===pathToFileURL(pathResolve(root,'lib/server/session.ts')).href){
+    return {format:'module',source:'export async function getUser(locals){return locals?.user===undefined?globalThis.__frontlaneRouteTest.user:locals.user}',shortCircuit:true};
   }
   if(url===pathToFileURL(pathResolve(workspace,'packages/database/src/client.mjs')).href){
     return {format:'module',source:'export function database(){return globalThis.__frontlaneRouteTest.db}',shortCircuit:true};

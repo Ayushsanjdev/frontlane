@@ -3,7 +3,10 @@ import assert from 'node:assert/strict';
 import {register} from 'node:module';
 register('./helpers/route-loader.mjs',import.meta.url);
 const {SOURCES}=await import('@frontlane/core/sources');
-const route=path=>import('../apps/web/app/api/'+path+'/route.ts');
+const route=async path=>{
+ const handlers=await import('../apps/web/src/routes/api/'+path+'/+server.ts');
+ return Object.fromEntries(Object.entries(handlers).filter(([,handler])=>typeof handler==='function').map(([method,handler])=>[method,(request,locals={})=>handler({request,url:new URL(request.url),locals})]));
+};
 const tracker=await route('tracker'),profile=await route('profile'),jobs=await route('jobs'),cron=await route('cron/jobs');
 const user={userId:'alice',displayName:'Alice'};
 const job={id:'live-2',title:'Frontend Engineer',company:'Example',location:'India',mode:'Remote',type:'Full-time',salary:'Not disclosed',tags:['TypeScript'],experience:'3+ years',summary:'Product frontend',caveat:'Review hours',url:'https://example.com/jobs/2',source:'greenhouse:example',discovered:'2026-10-10',checked:'2026-10-11T09:00:00.000Z',posted:null,eligibility:'India eligible',degree:'Equivalent experience accepted'};
@@ -110,7 +113,7 @@ test('curated fallback metadata preserves job IDs and validates for tracker and 
  assert.equal(Batch.parse({source:'curated:starter',runId:'starter-2026-10-11',jobs}).jobs.length,20);
 });
 test('job collection distinguishes an empty live feed from an unavailable database',async()=>{
- const {jobCollection}=await import('../apps/web/lib/jobs.ts');
+ const {jobCollection}=await import('../apps/web/src/lib/server/jobs.ts');
  globalThis.__frontlaneRouteTest.db={query:async(sql)=>({rows:sql.includes('count(*)')?[{total:0}]:sql.includes('max(completed_at)')?[{last:null}]:[]})};
  const live=await jobCollection(new URLSearchParams({limit:'3'}));
  assert.equal(live.jobs.length,0);
@@ -129,4 +132,17 @@ test('status endpoint records a failed SmartRecruiters feed',async()=>{
  const response=await status.POST(new Request('http://localhost:3000/api/ingest/status',{method:'POST',headers:{authorization:'Bearer '+'i'.repeat(32),'Content-Type':'application/json'},body:JSON.stringify(['smartrecruiters:nagarro1'])}));
  assert.equal(response.status,200);
  assert.deepEqual(recorded,['smartrecruiters:nagarro1']);
+});
+
+// Removing the per-request identity or replacing it with shared state must fail this test.
+test('concurrent tracker requests keep their own authenticated identity',async()=>{
+ const ids=[];
+ globalThis.__frontlaneRouteTest.db={query:async(_sql,args)=>{
+  await new Promise(resolve=>setImmediate(resolve));
+  ids.push(args[0]);
+  return {rows:[{payload:{owner:args[0]}}]};
+ }};
+ const responses=await Promise.all(['alice','bob'].map(userId=>tracker.GET(new Request('http://localhost:3000/api/tracker'),{user:{userId}})));
+ assert.deepEqual(await Promise.all(responses.map(response=>response.json())),[[{owner:'alice'}],[{owner:'bob'}]]);
+ assert.deepEqual(ids.sort(),['alice','bob']);
 });

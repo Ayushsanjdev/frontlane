@@ -21,7 +21,8 @@ function heartbeat(cookie,origin='http://localhost:3000'){
 }
 
 test('anonymous browser heartbeats count once across reloads and tabs',async()=>{
-  const {POST}=await import('../apps/web/app/api/viewers/route.ts');
+  const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
+  const POST=request=>handler({request,url:new URL(request.url),locals:{}});
   const first=await POST(heartbeat());
   assert.equal(first.status,200);
   assert.deepEqual(await first.json(),{total:1,current:1});
@@ -38,7 +39,8 @@ test('anonymous browser heartbeats count once across reloads and tabs',async()=>
 });
 
 test('expired viewers leave the current count while lifetime totals survive',async()=>{
-  const {POST}=await import('../apps/web/app/api/viewers/route.ts');
+  const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
+  const POST=request=>handler({request,url:new URL(request.url),locals:{}});
   await POST(heartbeat());
   await POST(heartbeat());
   await pg.query("UPDATE viewers SET last_seen_at=now()-interval '91 seconds'");
@@ -50,8 +52,9 @@ test('expired viewers leave the current count while lifetime totals survive',asy
 });
 
 test('simultaneous first visits share the browser cookie before counting a second tab',async()=>{
-  const {POST}=await import('../apps/web/app/api/viewers/route.ts');
-  const {viewerHeartbeat}=await import('../apps/web/lib/viewer-heartbeat.ts');
+  const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
+  const POST=request=>handler({request,url:new URL(request.url),locals:{}});
+  const {viewerHeartbeat}=await import('../apps/web/src/lib/viewer-heartbeat.ts');
   const original=globalThis.fetch;
   const navigatorDescriptor=Object.getOwnPropertyDescriptor(globalThis,'navigator');
   if(!globalThis.navigator?.locks){
@@ -84,14 +87,16 @@ test('simultaneous first visits share the browser cookie before counting a secon
 });
 
 test('cross-origin or missing-origin heartbeats never write visitor records',async()=>{
-  const {POST}=await import('../apps/web/app/api/viewers/route.ts');
+  const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
+  const POST=request=>handler({request,url:new URL(request.url),locals:{}});
   globalThis.__frontlaneRouteTest.db={query:()=>assert.fail('must reject before database access')};
   assert.equal((await POST(heartbeat(undefined,'https://other.example'))).status,403);
   assert.equal((await POST(new Request('http://localhost:3000/api/viewers',{method:'POST'}))).status,403);
 });
 
 test('database outages return unavailable counts and malformed cookies are replaced',async()=>{
-  const {POST}=await import('../apps/web/app/api/viewers/route.ts');
+  const {POST:handler}=await import('../apps/web/src/routes/api/viewers/+server.ts');
+  const POST=request=>handler({request,url:new URL(request.url),locals:{}});
   const replaced=await POST(heartbeat('frontlane_viewer=invalid'));
   assert.equal(replaced.status,200);
   assert.match(replaced.headers.get('set-cookie'),/frontlane_viewer=[0-9a-f-]{36};/);

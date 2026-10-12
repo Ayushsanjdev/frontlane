@@ -1,0 +1,13 @@
+diff --git a/dist/env.js b/dist/env.js
+index a1a26c80305ed6c96cb4352a2cdea717362f47db..2143a1bb9f28f3cff5cf23356f0ee2d8f7236f14 100644
+--- a/dist/env.js
++++ b/dist/env.js
+@@ -3,7 +3,7 @@ import { dev, building } from "$app/environment";
+ import { base } from "$app/paths";
+ export function setEnvDefaults(envObject, config) {
+     config.trustHost ??= dev;
+-    config.basePath = `${base}/auth`;
++    config.basePath ??= `${base}/auth`;
+     config.skipCSRFCheck = skipCSRFCheck;
+     if (building)
+         return;

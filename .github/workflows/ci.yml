@@ -16,3 +16,5 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm --filter @frontlane/web exec playwright install --with-deps chromium
+      - run: pnpm test:browser

@@ -5,7 +5,11 @@ packages:
 engineStrict: true
 verifyDepsBeforeRun: error
 
-# Native packages used by Next.js and Tailwind may run their install scripts.
+# Native build dependencies used by Vite and Tailwind.
 allowBuilds:
   '@tailwindcss/oxide': true
+  esbuild: true
   sharp: true
+
+patchedDependencies:
+  '@auth/sveltekit@1.11.3': patches/@auth__sveltekit@1.11.3.patch

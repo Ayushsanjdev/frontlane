@@ -1,6 +1,11 @@
 **/node_modules
 **/.pnpm-store
 **/.next
+**/.svelte-kit
+**/build
+**/.vercel
+playwright-report
+test-results
 **/*.tsbuildinfo
 .git
 .env*
