@@ -7,3 +7,6 @@
 **/.env*
 coverage
 *.zip
+.agents
+.neon
+skills-lock.json
