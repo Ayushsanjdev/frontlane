@@ -1,0 +1,16 @@
+{
+  "name": "@frontlane/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "refresh": "node --env-file-if-exists=../../.env.local scripts/refresh-jobs.mjs",
+    "publish:jobs": "node --env-file-if-exists=../../.env.local scripts/publish-jobs.mjs"
+  },
+  "dependencies": {
+    "@frontlane/core": "workspace:*"
+  }
+}

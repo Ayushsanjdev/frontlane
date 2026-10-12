@@ -1,2 +1,2 @@
-import {readFile} from 'node:fs/promises';import {ingest} from '../core/ingestion.mjs';import {database} from '../core/db.mjs';
-const jobs=JSON.parse(await readFile(new URL('../db/seed.json',import.meta.url),'utf8'));try{console.log(await ingest({source:'curated:starter',runId:'starter-2026-10-11',jobs}))}finally{await database().end()}
+import {readFile} from 'node:fs/promises';import {ingest} from '@frontlane/core/ingestion';import {database} from '@frontlane/database/client';
+const jobs=JSON.parse(await readFile(new URL(import.meta.resolve('@frontlane/database/seed')),'utf8'));try{console.log(await ingest({source:'curated:starter',runId:'starter-2026-10-11',jobs:jobs.map(({id,source,discovered,...input})=>input)}))}finally{await database().end()}

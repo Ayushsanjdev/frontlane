@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
     volumes:
       - frontlane-db:/var/lib/postgresql/data
-      - ./db/001-init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+      - ./packages/database/schema/001-init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
     healthcheck:
       test: [CMD-SHELL, 'pg_isready -U frontlane -d frontlane']
       interval: 5s

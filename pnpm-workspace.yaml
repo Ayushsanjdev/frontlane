@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+
+engineStrict: true
+verifyDepsBeforeRun: error
+
+# Native packages used by Next.js and Tailwind may run their install scripts.
+allowBuilds:
+  '@tailwindcss/oxide': true
+  sharp: true

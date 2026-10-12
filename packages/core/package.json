@@ -1,0 +1,21 @@
+{
+  "name": "@frontlane/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "exports": {
+    "./jobs": "./src/jobs.mjs",
+    "./profile": "./src/profile.mjs",
+    "./tracker": "./src/tracker.mjs",
+    "./refresh": "./src/refresh.mjs",
+    "./ingestion": "./src/ingestion.mjs",
+    "./sources": "./src/sources.mjs"
+  },
+  "dependencies": {
+    "@frontlane/database": "workspace:*",
+    "zod": "^3.25.76"
+  }
+}

@@ -1,0 +1,3 @@
+import {authorized,ingest} from '@frontlane/core/ingestion';import {boundedJson} from '@/lib/auth-api';
+export const runtime='nodejs';
+export async function POST(r:Request){if(!authorized(r,process.env.INGEST_TOKEN))return Response.json({error:'Unauthorized'},{status:401});try{const receipt=await ingest(await boundedJson(r,300000));return Response.json(receipt,{headers:{'Cache-Control':'no-store'}})}catch(e){const conflict=e instanceof Error&&e.message==='Idempotency conflict';return Response.json({error:conflict?'Run ID was already used with a different payload':'Invalid batch or unavailable database'},{status:conflict?409:400})}}
