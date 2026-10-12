@@ -20,3 +20,11 @@ test('cron ingestion uses savepoints and preserves earlier sources after a SQL f
  }catch(error){await client.query('ROLLBACK');throw error}
  finally{client.release()}
 });
+
+test('SmartRecruiters employer snapshots replace only their own jobs',async()=>{
+ await ingest({source:'smartrecruiters:example',runId:'smart-first-0001',jobs:[job],completeSnapshot:true},db);
+ await ingest({source:'smartrecruiters:example',runId:'smart-empty-0002',jobs:[],completeSnapshot:true},db);
+ const rows=(await pg.query("SELECT active FROM jobs WHERE source='smartrecruiters:example'")).rows;
+ assert.equal(rows.length,1);
+ assert.equal(rows[0].active,false);
+});

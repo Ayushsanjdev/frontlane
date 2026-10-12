@@ -2,6 +2,7 @@ import {test,beforeEach} from 'node:test';
 import assert from 'node:assert/strict';
 import {register} from 'node:module';
 register('./helpers/route-loader.mjs',import.meta.url);
+const {SOURCES}=await import('@frontlane/core/sources');
 const route=path=>import('../apps/web/app/api/'+path+'/route.ts');
 const tracker=await route('tracker'),profile=await route('profile'),jobs=await route('jobs'),cron=await route('cron/jobs');
 const user={userId:'alice',displayName:'Alice'};
@@ -73,14 +74,28 @@ test('cron processes sources on one connection and releases it after commit',asy
   connects++;assert.equal(connects,1,'must reuse the lock connection');return client;
  },query:async()=>assert.fail('must use lock connection for status writes')};
  const original=globalThis.fetch;
- globalThis.fetch=async url=>({ok:true,json:async()=>String(url).includes('greenhouse')?{jobs:[]}:[]});
+ globalThis.fetch=async url=>({ok:true,json:async()=>String(url).includes('smartrecruiters')?{content:[],totalFound:0}:String(url).includes('greenhouse')?{jobs:[]}:[]});
  try{
   const response=await cron.GET(new Request('http://localhost:3000/api/cron/jobs',{headers:{authorization:'Bearer '+'c'.repeat(32)}}));
   assert.equal(response.status,200);
   const body=await response.json();
-  assert.equal(body.sources.length,9);
+  assert.equal(body.sources.length,SOURCES.length);
   assert.ok(body.sources.every(source=>source.status==='ok'));
+  assert.deepEqual(body.summary,{target:50,published:0,shortfall:50,failedSources:0});
   assert.deepEqual(calls.slice(-2),['COMMIT','release']);
+ }finally{globalThis.fetch=original}
+});
+
+test('cron reports total source failure to the production scheduler',async()=>{
+ process.env.CRON_SECRET='c'.repeat(32);
+ const client={query:async sql=>({rows:sql.includes('pg_try_advisory_xact_lock')?[{locked:true}]:[]}),release(){}};
+ globalThis.__frontlaneRouteTest.db={connect:async()=>client};
+ const original=globalThis.fetch;
+ globalThis.fetch=async()=>({ok:false,status:503});
+ try{
+  const response=await cron.GET(new Request('http://localhost:3000/api/cron/jobs',{headers:{authorization:'Bearer '+'c'.repeat(32)}}));
+  assert.equal(response.status,503);
+  assert.equal((await response.json()).summary.published,0);
  }finally{globalThis.fetch=original}
 });
 
@@ -104,4 +119,14 @@ test('job collection distinguishes an empty live feed from an unavailable databa
  const fallback=await jobCollection(new URLSearchParams({limit:'3'}));
  assert.equal(fallback.jobs.length,3);
  assert.ok(fallback.warning);
+});
+
+test('status endpoint records a failed SmartRecruiters feed',async()=>{
+ process.env.INGEST_TOKEN='i'.repeat(32);
+ const status=await route('ingest/status');
+ const recorded=[];
+ globalThis.__frontlaneRouteTest.db={query:async(_sql,args)=>{recorded.push(args[0]);return {rows:[]}}};
+ const response=await status.POST(new Request('http://localhost:3000/api/ingest/status',{method:'POST',headers:{authorization:'Bearer '+'i'.repeat(32),'Content-Type':'application/json'},body:JSON.stringify(['smartrecruiters:nagarro1'])}));
+ assert.equal(response.status,200);
+ assert.deepEqual(recorded,['smartrecruiters:nagarro1']);
 });

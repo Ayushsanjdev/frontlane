@@ -8,6 +8,22 @@ import {spawnSync} from 'node:child_process';
 
 const worker=fileURLToPath(new URL('../apps/worker/scripts/publish-jobs.mjs',import.meta.url));
 const preload=fileURLToPath(new URL('./helpers/worker-fetch.mjs',import.meta.url));
+test('production refresh worker publishes 50 jobs and emits a summary',()=>{
+ const result=spawnSync(process.execPath,['--import',fileURLToPath(new URL('./helpers/refresh-fetch.mjs',import.meta.url)),fileURLToPath(new URL('../apps/worker/scripts/refresh-jobs.mjs',import.meta.url))],{
+  env:{...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'false'},encoding:'utf8',timeout:10000,
+ });
+ assert.equal(result.status,0,result.stderr);
+ assert.deepEqual(JSON.parse(result.stdout).summary,{target:50,published:50,shortfall:0,failedSources:0});
+});
+
+test('production refresh worker exits unsuccessfully when all employers fail',()=>{
+ const result=spawnSync(process.execPath,['--import',fileURLToPath(new URL('./helpers/refresh-fetch.mjs',import.meta.url)),fileURLToPath(new URL('../apps/worker/scripts/refresh-jobs.mjs',import.meta.url))],{
+  env:{...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'true'},encoding:'utf8',timeout:10000,
+ });
+ assert.equal(result.status,1);
+ assert.equal(JSON.parse(result.stdout).summary.shortfall,50);
+ assert.doesNotMatch(result.stderr,/status could not be persisted/);
+});
 for(const useInvokingDirectory of [false,true]){
  test('worker publishes a relative batch from '+(useInvokingDirectory?'pnpm INIT_CWD':'the current directory'),async()=>{
   const directory=await mkdtemp(join(tmpdir(),'frontlane-worker-'));

@@ -1,5 +1,5 @@
 import {authorized,ingest} from '@frontlane/core/ingestion';
-import {refreshSources} from '@frontlane/core/sources';
+import {refreshSources,refreshSummary} from '@frontlane/core/sources';
 import {withRefreshLock} from '@frontlane/core/refresh';
 import {database} from '@frontlane/database/client';
 import type {PoolClient} from 'pg';
@@ -17,7 +17,9 @@ export async function GET(request:Request){
       }
       return sources;
     });
-    return Response.json(result,{status:result.skipped?202:200,headers:{'Cache-Control':'no-store'}});
+    if(result.skipped)return Response.json(result,{status:202,headers:{'Cache-Control':'no-store'}});
+    const summary=refreshSummary(result.sources);
+    return Response.json({...result,summary},{status:summary.failedSources===result.sources.length?503:200,headers:{'Cache-Control':'no-store'}});
   }catch{
     return Response.json({error:'Job refresh is unavailable. Please try again.'},{status:503,headers:{'Cache-Control':'no-store'}});
   }

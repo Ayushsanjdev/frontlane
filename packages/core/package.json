@@ -12,7 +12,8 @@
     "./tracker": "./src/tracker.mjs",
     "./refresh": "./src/refresh.mjs",
     "./ingestion": "./src/ingestion.mjs",
-    "./sources": "./src/sources.mjs"
+    "./sources": "./src/sources.mjs",
+    "./viewers": "./src/viewers.mjs"
   },
   "dependencies": {
     "@frontlane/database": "workspace:*",

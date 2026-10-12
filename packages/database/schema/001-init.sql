@@ -8,3 +8,5 @@ CREATE TABLE IF NOT EXISTS profiles (user_id text PRIMARY KEY,payload jsonb NOT 
 CREATE TABLE IF NOT EXISTS ingestion_runs(source text NOT NULL,run_id text NOT NULL,body_hash text NOT NULL,receipt jsonb NOT NULL,completed_at timestamptz NOT NULL DEFAULT now(),PRIMARY KEY(source,run_id));
 CREATE INDEX IF NOT EXISTS ingestion_runs_completed ON ingestion_runs(completed_at DESC);
 CREATE TABLE IF NOT EXISTS source_checks(source text PRIMARY KEY, checked_at timestamptz NOT NULL, status text NOT NULL,matched integer NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS viewers (id uuid PRIMARY KEY, last_seen_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS viewers_last_seen ON viewers(last_seen_at);

@@ -83,9 +83,15 @@ Configure Google OAuth with the deployed callback URL. Keep secrets in your host
 
 Configure one scheduler:
 
-- **GitHub Actions:** set repository variable `APP_URL` and secret `INGEST_TOKEN`. `.github/workflows/jobs.yml` runs at 02:30 and 12:30 UTC (8 AM and 6 PM IST); GitHub may delay scheduled runs.
-- **Server cron:** set `APP_URL` and `INGEST_TOKEN` on the worker. For a server using UTC, run `30 2,12 * * * cd /absolute/path/frontlane && pnpm jobs:refresh`.
+- **GitHub Actions:** set repository variable `APP_URL` and secret `INGEST_TOKEN`. `.github/workflows/jobs.yml` runs daily at 02:30 UTC (8 AM IST); GitHub may delay scheduled runs.
+- **Server cron:** set `APP_URL` and `INGEST_TOKEN` on the worker. For a server using UTC, run `30 2 * * * cd /absolute/path/frontlane && pnpm jobs:refresh`.
 - **Hosting cron:** `apps/web/vercel.json` schedules `GET /api/cron/jobs`. Requests require `Authorization: Bearer CRON_SECRET`; configure the secret and check your host's frequency and execution-duration limits.
+
+The daily refresh targets **50 available frontend jobs** eligible for India or explicitly worldwide remote work. It reads public Greenhouse, Lever, and SmartRecruiters employer feeds, deduplicates application URLs, and selects across employers, employment types, and remote/hybrid/onsite arrangements. Every automated listing links to the employer-provided career page or hosted ATS posting. Part-time, contract, and freelance roles are included when employers supply them; no fixed mix or 50-job minimum is guaranteed by upstream availability.
+
+Each successful employer snapshot replaces that employer's portion of the daily selection, so jobs outside the current selection become inactive. Failed or malformed sources retain their previous listings. Manual/research and starter listings are independent and remain untouched, so the total board can exceed 50. The worker output and cron response include `summary.target`, `published`, `shortfall`, and `failedSources`. A complete source failure returns HTTP 503 or a nonzero worker exit status; a shortfall is reported without inventing listings. `/updates` shows per-source selected counts and check times.
+
+For production, enable **only one** scheduler above. On Vercel, deploy the committed cron configuration and set `DATABASE_URL` and a separate `CRON_SECRET` of at least 32 characters. With GitHub Actions, point `APP_URL` at the production HTTPS origin and configure the matching `INGEST_TOKEN` in both GitHub and the app. Use the workflow's **Run workflow** button or `pnpm jobs:refresh` for the initial refresh, then inspect its summary and `/updates`. Localhost does not run the production schedule automatically.
 
 The external worker needs `APP_URL` and `INGEST_TOKEN`, without database credentials. Failed source retrieval preserves existing jobs. The public `/api/jobs` endpoint is read-only.
 
