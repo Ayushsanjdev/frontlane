@@ -1,8 +1,6 @@
 name: Refresh FrontlaneJobs employer feeds
 on:
-  schedule:
-    # Daily at 08:00 in India. GitHub may delay scheduled runs.
-    - cron: '30 2 * * *'
+  # Daily scheduling is handled by cron-job.org; retain manual recovery runs.
   workflow_dispatch:
 concurrency:
   group: frontlane-public-job-ingestion
