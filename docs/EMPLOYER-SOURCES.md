@@ -1,6 +1,6 @@
 # Employer source discovery
 
-The daily cron refreshes the employer boards registered in `packages/core/src/sources.mjs`. It does not discover new employers automatically. The source list now contains 39 boards; the daily selection target remains 50 unique eligible jobs across employers and working arrangements.
+The daily cron refreshes the employer boards registered in `packages/core/src/sources.mjs`. It does not discover new employers automatically. The source list now contains 43 boards; the daily selection target remains 50 unique eligible jobs across employers and working arrangements.
 
 ## Sources verified on 2026-10-13
 
@@ -17,6 +17,28 @@ These seven newly monitored boards returned eight eligible roles through their o
 | Synergy Machines | `smartrecruiters:synergymachines` | [Senior Development Engineer - React Frontend](https://jobs.smartrecruiters.com/SynergyMachines/743999796985247-senior-development-engineer-react-frontend) | Remote, Gurugram, India |
 
 HighLevel also returned [Staff Engineer - Platform Frontend](https://jobs.lever.co/gohighlevel/5b51c71b-a61e-41e4-82e3-7fa4deb2678a).
+
+## Additional research on 2026-10-13
+
+Checked the existing 39 source identifiers and employer names before adding these four distinct employers. Candidate feeds were tested with `refreshSources` and a capture-only callback before publication. They returned 12 eligible roles in total; the shared 50-job selection still determines how many are published from each board.
+
+| Employer and official careers | Supported feed | Verified example | Location | Eligible roles in candidate feed |
+| --- | --- | --- | --- | --- |
+| [MeltPlan](https://www.meltplan.com/careers) | `greenhouse:meltplan` | [Senior Full Stack Engineer – Frontend Focused](https://job-boards.greenhouse.io/meltplan/jobs/4146430009) | Bengaluru, India | 2 |
+| [Poppulo](https://www.poppulo.com/careers) | `greenhouse:poppulo` | [Software Development Engineer II - Frontend / Full Stack](https://job-boards.greenhouse.io/poppulo/jobs/8146847) | Bengaluru, India - Hybrid | 1 |
+| [Sia](https://www.sia-partners.com/en/opportunities) | `smartrecruiters:sia` | [Senior Frontend Engineer (Reactjs)](https://jobs.smartrecruiters.com/Sia/744000143767580-senior-frontend-engineer-reactjs-) | Mumbai, India; description explicitly onsite | 2 |
+| [NEC Software Solutions](https://www.necsws.com/careers/) | `smartrecruiters:necsws` | [Frontend Developer - Angular](https://jobs.smartrecruiters.com/NECSWS/744000152342390-frontend-developer-angular) | Mumbai, India | 7 |
+
+MeltPlan's careers page links both the example and [UI Engineering Lead](https://job-boards.greenhouse.io/meltplan/jobs/4250926009). Poppulo's rendered open-roles section links the exact Greenhouse requisition. Sia's two distinct requisitions include [Senior Full Stack Engineer (Frontend)](https://jobs.smartrecruiters.com/Sia/744000143768199-senior-full-stack-engineer-frontend-). NEC's careers page links its `NECSWS` SmartRecruiters board; its feed also returned a frontend Node.js role in Bengaluru and a Java/React role in Pune. The NEC Angular-titled example currently describes a .NET/Blazor frontend platform: applicants should read the full description rather than infer the stack from its title.
+
+### Leads not added
+
+- Level AI's legacy Lever API still returned a Noida frontend role, but its [official careers page](https://thelevel.ai/careers) now links [Ashby](https://jobs.ashbyhq.com/level-ai). Do not add the legacy board without resolving this migration. Ashby remains unsupported by the current automatic adapters.
+- Celonis, Yugabyte, Eltropy, Glean, FalconX, Zuora, Plivo, Dialpad, Crunchyroll, Deliveroo, New Relic, Vonage, Sprinto, and Sectigo returned no eligible roles under the unchanged filters during these checks. Cached search results were not treated as proof of a live opening.
+- Candidate board identifiers for Atomicwork, Tekion, Sprinklr, Sarvam, Atlan, Granicus, Phenom, and Eightfold returned HTTP 404. This does not imply the employers have no vacancies; locate their current official ATS before retrying.
+- Typeset's SmartRecruiters feed returned a Bengaluru frontend role, but current employer-careers attribution was not verified, so it was not added.
+
+The previous source additions and HTML cleaner fix are already deployed: Vercel's production overview showed commit `94ce4af` as Ready on `frontlanejobs.vercel.app` during this research. The four additions above require a subsequent deployment.
 
 ## Adding more employers
 

@@ -31,6 +31,8 @@ export const SOURCES=[
   ['greenhouse','hyreo','Hyreo'],
   ['greenhouse','sigmoid','Sigmoid'],
   ['greenhouse','openfx','OpenFX'],
+  ['greenhouse','meltplan','MeltPlan'],
+  ['greenhouse','poppulo','Poppulo'],
   ['lever','greenlight','Greenlight'],
   ['lever','drivetrain','Drivetrain'],
   ['lever','hevodata','Hevo Data'],
@@ -44,6 +46,8 @@ export const SOURCES=[
   ['smartrecruiters','BoschGroup','Bosch'],
   ['smartrecruiters','Miratech1','Miratech'],
   ['smartrecruiters','SynergyMachines','Synergy Machines'],
+  ['smartrecruiters','Sia','Sia'],
+  ['smartrecruiters','NECSWS','NEC Software Solutions'],
 ];
 
 export function clean(value){
