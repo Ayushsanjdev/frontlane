@@ -1,4 +1,5 @@
 import {randomUUID} from 'node:crypto';
+import {decodeHTMLStrict} from 'entities';
 import {canonicalUrl,JobInput} from './ingestion.mjs';
 import {smartRecruitersJobs} from './smartrecruiters.mjs';
 
@@ -26,20 +27,35 @@ export const SOURCES=[
   ['greenhouse','fivetran','Fivetran'],
   ['greenhouse','diligentcorporation','Diligent'],
   ['greenhouse','toast','Toast'],
+  ['greenhouse','sonicwall','SonicWall'],
+  ['greenhouse','hyreo','Hyreo'],
+  ['greenhouse','sigmoid','Sigmoid'],
+  ['greenhouse','openfx','OpenFX'],
   ['lever','greenlight','Greenlight'],
   ['lever','drivetrain','Drivetrain'],
   ['lever','hevodata','Hevo Data'],
   ['lever','acceldata','Acceldata'],
   ['lever','meesho','Meesho'],
   ['lever','mindtickle','Mindtickle'],
+  ['lever','gohighlevel','HighLevel'],
+  ['lever','lingarogroup','Lingaro'],
   ['smartrecruiters','Nagarro1','Nagarro'],
   ['smartrecruiters','SopraSteria1','Sopra Steria'],
   ['smartrecruiters','BoschGroup','Bosch'],
   ['smartrecruiters','Miratech1','Miratech'],
+  ['smartrecruiters','SynergyMachines','Synergy Machines'],
 ];
 
 export function clean(value){
-  return String(value||'').replace(/<[^>]*>/g,' ').replace(/&[a-z#0-9]+;/gi,' ').replace(/\s+/g,' ').trim();
+  let text=String(value||'');
+  // ATS feeds can escape the entire HTML document, sometimes more than once.
+  // Decode before stripping tags so their names and attributes never become text.
+  for(;;){
+    const decoded=decodeHTMLStrict(text);
+    if(decoded===text)break;
+    text=decoded;
+  }
+  return text.replace(/<!--[\s\S]*?-->|<!doctype\b[^>]*>|<\/?[a-z][^>]*>/gi,' ').replace(/\s+/g,' ').trim();
 }
 
 export function eligible(title,location,description){

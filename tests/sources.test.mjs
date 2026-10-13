@@ -14,6 +14,26 @@ function feeds(t,data){
   });
 }
 
+test('feed descriptions decode escaped HTML before removing tags',async t=>{
+  feeds(t,{alpha:{jobs:[greenhouse(1,{
+    content:'&lt;div class=&quot;content-intro&quot;&gt;&lt;p&gt;&lt;strong&gt;WHO ARE WE?&lt;/strong&gt;&lt;/p&gt;&lt;p style=&quot;font-family: arial&quot;&gt;Build React &amp;amp; TypeScript interfaces.&lt;/p&gt;&lt;/div&gt;',
+  })]}});
+  const batches=[];
+  await adapters.refreshSources(async batch=>{batches.push(batch);return {accepted:batch.jobs.length}},{sources:sources.slice(0,1)});
+  assert.equal(batches[0].jobs[0].summary,'WHO ARE WE? Build React & TypeScript interfaces.');
+});
+
+test('description cleaning preserves punctuation and handles numeric and nested entities',()=>{
+  for(const [input,expected] of [
+    ['<p>React &amp; TypeScript</p><p>India&rsquo;s team&nbsp;&#8212; apply &#x1F680;</p>','React & TypeScript India’s team — apply 🚀'],
+    ['&amp;lt;p&amp;gt;Build web interfaces&amp;lt;/p&amp;gt;','Build web interfaces'],
+    ['&#60;p&#62;Build web interfaces&#60;/p&#62;','Build web interfaces'],
+    ['<!DOCTYPE html><html><body><!-- Employer description --><p>Build React</p></body></html>','Build React'],
+    ['Experience: 3 < 5 years. AT&T.','Experience: 3 < 5 years. AT&T.'],
+    ['',''],
+  ])assert.equal(adapters.clean(input),expected);
+});
+
 test('daily refresh selects 50 unique jobs with employer and work-arrangement variety',async t=>{
   feeds(t,{
     alpha:{jobs:Array.from({length:110},(_,i)=>greenhouse(i))},
