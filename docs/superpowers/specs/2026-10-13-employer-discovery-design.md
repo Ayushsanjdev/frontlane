@@ -1,7 +1,7 @@
 # Automatic employer discovery with Brave Search
 
 Date: 2026-10-13
-Status: proposed for written review
+Status: approved by the user on 2026-10-14
 
 ## Goal and agreed scope
 

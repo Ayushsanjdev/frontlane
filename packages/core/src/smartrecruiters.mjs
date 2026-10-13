@@ -1,7 +1,8 @@
 // Public employer postings: https://developers.smartrecruiters.com/docs/endpoints
-export async function smartRecruitersJobs(slug,fetchJson,eligible,target){
+export async function smartRecruitersJobs(slug,fetchJson,eligible,target,{signal:callerSignal}={}){
   const base=`https://api.smartrecruiters.com/v1/companies/${encodeURIComponent(slug)}/postings`;
-  const signal=AbortSignal.timeout(45000);
+  const timeout=AbortSignal.timeout(45000);
+  const signal=callerSignal?AbortSignal.any([callerSignal,timeout]):timeout;
   const candidates=[];
   const seen=new Set();
   let offset=0;
@@ -31,7 +32,7 @@ export async function smartRecruitersJobs(slug,fetchJson,eligible,target){
         workplaceType:row.location.remote?'remote':row.location.hybrid?'hybrid':'on-site',
         categories:{commitment:row.typeOfEmployment?.label},
         descriptionPlain:Object.values(row.jobAd.sections).map(section=>section.text||'').join(' '),
-        hostedUrl:row.postingUrl,posted:row.releasedDate||null,
+        hostedUrl:row.postingUrl,posted:row.releasedDate||null,company:row.company,
       });
     }
   }
