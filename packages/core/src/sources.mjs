@@ -161,6 +161,10 @@ function selectJobs(feeds){
   return new Map(queues.map(item=>[item.source,item.selected]));
 }
 
+/**
+ * @param {(batch:any)=>Promise<any>} publish
+ * @param {{sources?:string[][],signal?:AbortSignal,fetchImpl?:typeof fetch,rotation?:number}} [options]
+ */
 export async function refreshSources(publish,{sources=SOURCES,signal,fetchImpl=fetch,rotation=0}={}){
   const checked=new Date().toISOString();
   const runId='ats-'+randomUUID();

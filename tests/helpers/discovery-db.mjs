@@ -12,7 +12,7 @@ export async function discoveryDatabase(){
     let unlock;
     tail=new Promise(resolve=>{unlock=resolve});
     await previous;
-    return {query:(...args)=>pg.query(...args),release:()=>unlock()};
+    return {query:(input,args)=>typeof input==='string'?pg.query(input,args):pg.query(input.text,input.values),release:()=>unlock()};
   };
   const db={connect,query:async(...args)=>{
     const client=await connect();

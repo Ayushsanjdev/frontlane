@@ -2,6 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {discoveryDatabase} from './helpers/discovery-db.mjs';
 import {SOURCES} from '@frontlanejobs/core/sources';
+import {refreshSources} from '@frontlanejobs/core/sources';
 import {seedEmployers,upsertCandidate,claimCandidates,recordVerification,registeredSources,markEmployerChecks,discoveryPublicSummary} from '../packages/core/src/employers.mjs';
 
 test('registry preserves seeds, deduplicates candidates, and registers only verified eligible employers',async()=>{
@@ -21,6 +22,28 @@ test('registry preserves seeds, deduplicates candidates, and registers only veri
     assert.equal(summary.registeredEmployers,1);
     assert.equal(summary.lastRun,null);
     assert.doesNotMatch(JSON.stringify(summary),/fixture|boardUrl/);
+  }finally{await f.close()}
+});
+
+test('selection priority does not synchronize with the discovered polling window',async()=>{
+  const f=await discoveryDatabase();
+  try{
+    await seedEmployers(f.db);
+    // 20 per batch and 43 seeds produce a 63-source selection period.
+    await f.db.query("INSERT INTO employer_sources(source,provider,slug,company,origin,verified_at) SELECT 'greenhouse:discover'||n,'greenhouse','discover'||n,'Discovered '||n,'discovered',now() FROM generate_series(1,1260) n");
+    const seen=new Set();
+    const fetchImpl=async input=>{
+      const url=new URL(input),slug=url.pathname.split('/').at(-2);
+      if(url.hostname==='api.smartrecruiters.com')return Response.json({content:[],totalFound:0});
+      if(url.hostname==='api.lever.co')return Response.json([{id:'1',text:'Frontend Engineer',categories:{location:'India'},descriptionPlain:'React',hostedUrl:input+'/job'}]);
+      return Response.json({jobs:[{id:1,title:'Frontend Engineer',location:{name:'India'},content:'React',absolute_url:`https://job-boards.greenhouse.io/${slug}/jobs/1`}]});
+    };
+    for(let day=0;day<126;day++){
+      const now=new Date(Date.UTC(2026,9,14+day)),selection=await registeredSources(f.db,{now});
+      const outcomes=await refreshSources(async batch=>{if(batch.jobs.length)seen.add(batch.source);return {}},{sources:selection.sources,rotation:selection.rotation,fetchImpl});
+      await markEmployerChecks(f.db,outcomes,{now});
+    }
+    assert.equal([...seen].filter(source=>source.startsWith('greenhouse:discover')).length,1260);
   }finally{await f.close()}
 });
 

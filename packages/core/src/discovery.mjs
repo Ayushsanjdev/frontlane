@@ -1,8 +1,9 @@
 import {randomUUID} from 'node:crypto';
 import {performance} from 'node:perf_hooks';
 import {reserveSearch,searchAllowance} from './discovery-budget.mjs';
-import {seedEmployers,upsertCandidate,claimCandidates,recordVerification} from './employers.mjs';
+import {seedEmployers,upsertCandidates,claimCandidates,recordVerification} from './employers.mjs';
 import {parseBoardUrl,verifyCandidate} from './board-discovery.mjs';
+import {boundedDiscoveryDatabase,DiscoveryDeadline} from './discovery-store.mjs';
 
 const hosts=['job-boards.greenhouse.io','boards.greenhouse.io','jobs.lever.co','jobs.smartrecruiters.com'];
 const roles=['frontend engineer','React developer','Angular developer','Vue developer','UI engineer','web developer'];
@@ -14,10 +15,16 @@ export function discoveryQuery(index){
   return {q:`site:${host} "${role}" "${location}"`,...(Math.floor(index/length)%2?{freshness:'pm'}:{})};
 }
 
+/**
+ * @param {any} db
+ * @param {{apiKey?:string,fetchImpl?:typeof fetch,now?:()=>Date,timeoutMs?:number}} [options]
+ */
 export async function runDiscovery(db,{apiKey,fetchImpl=fetch,now=()=>new Date(),timeoutMs=20000}={}){
   const runId=randomUUID(),started=now(),start=performance.now();
   const limit=Math.max(1,Math.min(20000,timeoutMs)),deadline=AbortSignal.timeout(limit);
-  const lease=await db.query('UPDATE discovery_state SET lease_token=$1,lease_expires_at=$2 WHERE id=true AND (lease_expires_at IS NULL OR lease_expires_at<=$3) RETURNING id',[runId,new Date(started.getTime()+60000),started]);
+  const workDb=boundedDiscoveryDatabase(db,start+limit);
+  const completionDb=boundedDiscoveryDatabase(db,start+limit+5000);
+  const lease=await completionDb.query('UPDATE discovery_state SET lease_token=$1,lease_expires_at=$2 WHERE id=true AND (lease_expires_at IS NULL OR lease_expires_at<=$3) RETURNING id',[runId,new Date(started.getTime()+60000),started]);
   if(!lease.rows.length)return {status:'busy'};
   const summary={runId,status:'complete',searchesReserved:0,searchesSucceeded:0,candidatesAdded:0,verified:0,registered:0,noMatch:0,pending:0,failed:0,deferred:0,allowance:null};
   let verifiedAttempts=0;
@@ -25,11 +32,11 @@ export async function runDiscovery(db,{apiKey,fetchImpl=fetch,now=()=>new Date()
   const requestSignal=()=>AbortSignal.any([deadline,AbortSignal.timeout(6000)]);
   const verifyQueued=async()=>{
     while(verifiedAttempts<4&&canStart()){
-      const [candidate]=await claimCandidates(db,{now:now(),limit:1,leaseMs:60000});
+      const [candidate]=await claimCandidates(workDb,{now:now(),limit:1,leaseMs:60000});
       if(!candidate)break;
       verifiedAttempts++;
       const result=await verifyCandidate(candidate,{fetchImpl,signal:requestSignal(),now:now()});
-      const receipt=await recordVerification(db,candidate,result,{now:now()});
+      const receipt=await recordVerification(workDb,candidate,result,{now:now()});
       if(result.status==='verified')summary.verified++;
       else if(result.status==='no-match')summary.noMatch++;
       else if(result.status==='pending')summary.pending++;
@@ -38,13 +45,13 @@ export async function runDiscovery(db,{apiKey,fetchImpl=fetch,now=()=>new Date()
     }
   };
   try{
-    await db.query('INSERT INTO discovery_runs(id,started_at,status) VALUES($1,$2,$3)',[runId,started,'running']);
-    await seedEmployers(db);
+    await completionDb.query('INSERT INTO discovery_runs(id,started_at,status) VALUES($1,$2,$3)',[runId,started,'running']);
+    if(canStart())await seedEmployers(workDb);
     await verifyQueued();
     if(!apiKey)summary.status='missing-key';
     else{
       for(let attempt=0;attempt<2&&canStart();attempt++){
-        const reservation=await reserveSearch(db,{now:now()});
+        const reservation=await reserveSearch(workDb,{now:now()});
         if(!reservation.allowed){summary.status='budget-exhausted';break}
         summary.searchesReserved++;
         const query=discoveryQuery(reservation.queryIndex);
@@ -59,22 +66,27 @@ export async function runDiscovery(db,{apiKey,fetchImpl=fetch,now=()=>new Date()
           results=data.web.results.slice(0,20);summary.searchesSucceeded++;
         }catch{summary.failed++;continue}
         // Persistence failures must surface: a paid search is counted even if saving its leads fails.
-        for(const result of results){
-          const candidate=parseBoardUrl(result?.url);
-          if(candidate&&(await upsertCandidate(db,{...candidate,query:query.q},{now:now()})).inserted)summary.candidatesAdded++;
-        }
+        const candidates=results.map(result=>parseBoardUrl(result?.url)).filter(Boolean).map(candidate=>({...candidate,query:query.q}));
+        summary.candidatesAdded+=await upsertCandidates(workDb,candidates,{now:now()});
       }
     }
     await verifyQueued();
-    summary.allowance=await searchAllowance(db,{now:now()});
-    summary.deferred=(await db.query("SELECT count(*)::int AS count FROM discovery_candidates WHERE status<>'verified'")).rows[0].count;
+    summary.allowance=await searchAllowance(completionDb,{now:now()});
+    summary.deferred=(await completionDb.query("SELECT count(*)::int AS count FROM discovery_candidates WHERE status<>'verified'")).rows[0].count;
     if(summary.status==='complete'&&(summary.failed||!canStart()))summary.status='partial';
-    await db.query('UPDATE discovery_runs SET completed_at=$2,status=$3,summary=$4 WHERE id=$1',[runId,now(),summary.status,summary]);
+    await completionDb.query('UPDATE discovery_runs SET completed_at=$2,status=$3,summary=$4 WHERE id=$1',[runId,now(),summary.status,summary]);
     return summary;
   }catch(error){
-    await db.query("UPDATE discovery_runs SET completed_at=$2,status='failed',summary=$3 WHERE id=$1",[runId,now(),{...summary,status:'failed'}]);
+    if(error instanceof DiscoveryDeadline){
+      summary.status='partial';
+      summary.allowance=await searchAllowance(completionDb,{now:now()});
+      summary.deferred=(await completionDb.query("SELECT count(*)::int AS count FROM discovery_candidates WHERE status<>'verified'")).rows[0].count;
+      await completionDb.query('UPDATE discovery_runs SET completed_at=$2,status=$3,summary=$4 WHERE id=$1',[runId,now(),summary.status,summary]);
+      return summary;
+    }
+    await completionDb.query("UPDATE discovery_runs SET completed_at=$2,status='failed',summary=$3 WHERE id=$1",[runId,now(),{...summary,status:'failed'}]);
     throw error;
   }finally{
-    await db.query('UPDATE discovery_state SET lease_token=NULL,lease_expires_at=NULL WHERE id=true AND lease_token=$1',[runId]);
+    await completionDb.query('UPDATE discovery_state SET lease_token=NULL,lease_expires_at=NULL WHERE id=true AND lease_token=$1',[runId]);
   }
 }

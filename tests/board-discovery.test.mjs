@@ -35,3 +35,10 @@ test('verification refuses unrelated hosted application boards and ambiguous Lev
   assert.equal((await verifyCandidate(lever,{fetchImpl})).company,'Beta Company');
   assert.equal((await verifyCandidate(lever,{fetchImpl:async input=>new URL(input).hostname==='jobs.lever.co'?new Response('<title>Frontend Engineer</title>'):fetchImpl(input)})).status,'pending');
 });
+
+test('Lever plain employer titles are verified against official hosted board metadata',async()=>{
+  const candidate={provider:'lever',slug:'drivetrain',source:'lever:drivetrain'};
+  const fetchImpl=async input=>new URL(input).hostname==='jobs.lever.co'?new Response('<title>Drivetrain</title><meta property="og:title" content="Drivetrain">'):Response.json([{id:'1',text:'Frontend Engineer',categories:{location:'India'},descriptionPlain:'React',hostedUrl:'https://jobs.lever.co/drivetrain/12345678-1234-1234-1234-123456789012'}]);
+  assert.equal((await verifyCandidate(candidate,{fetchImpl})).status,'verified');
+  assert.equal((await verifyCandidate(candidate,{fetchImpl:async input=>new URL(input).hostname==='jobs.lever.co'?new Response('<title>Frontend Engineer</title><meta property="og:title" content="Frontend Engineer">'):fetchImpl(input)})).status,'pending');
+});

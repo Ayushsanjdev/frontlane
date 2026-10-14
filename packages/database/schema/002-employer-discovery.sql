@@ -1,9 +1,10 @@
 CREATE TABLE IF NOT EXISTS employer_sources (
   source text PRIMARY KEY, provider text NOT NULL CHECK(provider IN ('greenhouse','lever','smartrecruiters')),
   slug text NOT NULL, company text NOT NULL, origin text NOT NULL CHECK(origin IN ('seeded','discovered')),
-  verified_at timestamptz, last_attempt_at timestamptz, last_status text,
+  verified_at timestamptz, last_attempt_at timestamptz, last_selected_at timestamptz, last_status text,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE employer_sources ADD COLUMN IF NOT EXISTS last_selected_at timestamptz;
 CREATE INDEX IF NOT EXISTS employers_check_priority ON employer_sources(origin,last_attempt_at,source);
 CREATE TABLE IF NOT EXISTS discovery_candidates (
   source text PRIMARY KEY, provider text NOT NULL, slug text NOT NULL, board_url text NOT NULL,

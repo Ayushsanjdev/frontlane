@@ -1,6 +1,6 @@
 # Automatic Employer Discovery Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Discover supported employers with Brave Search, verify their live jobs, and register them for future refreshes within durable request caps.
 
@@ -72,7 +72,7 @@
 - `markEmployerChecks(queryable, outcomes, {now}) -> Promise<void>` records attempts, including failures, without changing trusted identity.
 - `discoveryPublicSummary(queryable) -> Promise<{lastRun, registeredEmployers}>` contains no raw queries or candidate evidence.
 
-- [ ] Write failing registry tests with a complete PGlite fixture. The fixture reads both SQL files in filename order and implements pool client release cleanup. Give test pool clients exclusive transaction access so overlapping tests cannot interleave PGlite's single backend transaction.
+- [x] Write failing registry tests with a complete PGlite fixture. The fixture reads both SQL files in filename order and implements pool client release cleanup. Give test pool clients exclusive transaction access so overlapping tests cannot interleave PGlite's single backend transaction.
 
 ```js
 test('repeated seeding preserves verified identities', async () => {
@@ -87,10 +87,10 @@ test('repeated seeding preserves verified identities', async () => {
 });
 ```
 
-- [ ] Run `node --test tests/employers.test.mjs`; confirm the missing module/schema fails.
-- [ ] Create tables: `employer_sources` keyed by source, with provider/original slug/name/origin/verification/check timestamps; `discovery_candidates` keyed by source, with evidence, status, retry timestamp, lease token/expiry; `discovery_requests` keyed by UUID with UTC timestamp and query index; singleton `discovery_state` with next query index; `discovery_runs` keyed by UUID with start/end/status/JSON summary. Add indexes for due candidates, request timestamps, and source check priority.
-- [ ] Change migration to read sorted `.sql` files from `packages/database/schema`, run all in a transaction, roll back on failure, and always release/end the pool. Keep existing schema exports working for existing tests.
-- [ ] Implement registry mutations with parameterized SQL, seed `ON CONFLICT DO NOTHING`, candidate deduplication, expiring leases, and ownership checks. Use `FOR UPDATE SKIP LOCKED` when claiming due candidates. Retry no-match candidates after seven days; transient failures after an exponentially increasing delay capped at one day; pending identity candidates after one day.
+- [x] Run `node --test tests/employers.test.mjs`; confirm the missing module/schema fails.
+- [x] Create tables: `employer_sources` keyed by source, with provider/original slug/name/origin/verification/check timestamps; `discovery_candidates` keyed by source, with evidence, status, retry timestamp, lease token/expiry; `discovery_requests` keyed by UUID with UTC timestamp and query index; singleton `discovery_state` with next query index; `discovery_runs` keyed by UUID with start/end/status/JSON summary. Add indexes for due candidates, request timestamps, and source check priority.
+- [x] Change migration to read sorted `.sql` files from `packages/database/schema`, run all in a transaction, roll back on failure, and always release/end the pool. Keep existing schema exports working for existing tests.
+- [x] Implement registry mutations with parameterized SQL, seed `ON CONFLICT DO NOTHING`, candidate deduplication, expiring leases, and ownership checks. Use `FOR UPDATE SKIP LOCKED` when claiming due candidates. Retry no-match candidates after seven days; transient failures after an exponentially increasing delay capped at one day; pending identity candidates after one day.
 
 ```sql
 WITH due AS (
@@ -105,8 +105,8 @@ FROM due WHERE candidate.source=due.source
 RETURNING candidate.*;
 ```
 
-- [ ] Add tests for duplicate candidate URLs, trusted source preservation, lease expiry and stale completion rejection, no-match rescheduling, discovered-source priority, and failure attempts moving to the end of the refresh queue.
-- [ ] Run `node --test tests/employers.test.mjs tests/monorepo.test.mjs`; commit the schema/registry change.
+- [x] Add tests for duplicate candidate URLs, trusted source preservation, lease expiry and stale completion rejection, no-match rescheduling, discovered-source priority, and failure attempts moving to the end of the refresh queue.
+- [x] Run `node --test tests/employers.test.mjs tests/monorepo.test.mjs`; commit the schema/registry change.
 
 ### Task 2: Durable Brave request budget
 
@@ -116,7 +116,7 @@ RETURNING candidate.*;
 - `reserveSearch(db, {now=new Date()}) -> Promise<{allowed, attemptId?, queryIndex?, dayUsed, monthUsed, reason?}>`.
 - `searchAllowance(queryable, {now=new Date()}) -> Promise<{dayUsed, monthUsed, dayRemaining, monthRemaining}>`.
 
-- [ ] Write failing tests for the 30th/31st request, the independent monthly guard using a prepopulated historical ledger of 999/1,000 entries, UTC midnight/month rollover, 40 concurrent attempts, and a simulated failure after reservation. Under normal daily accounting a 31-day month permits at most 930 requests; historical fixture entries deliberately exercise the additional monthly defense without attempting 1,000 ordinary reservations in one month.
+- [x] Write failing tests for the 30th/31st request, the independent monthly guard using a prepopulated historical ledger of 999/1,000 entries, UTC midnight/month rollover, 40 concurrent attempts, and a simulated failure after reservation. Under normal daily accounting a 31-day month permits at most 930 requests; historical fixture entries deliberately exercise the additional monthly defense without attempting 1,000 ordinary reservations in one month.
 
 ```js
 test('concurrent reservations never exceed the daily cap', async () => {
@@ -130,8 +130,8 @@ test('concurrent reservations never exceed the daily cap', async () => {
 });
 ```
 
-- [ ] Run `node --test tests/discovery-budget.test.mjs`; confirm it fails before implementation.
-- [ ] Implement one short owned transaction: acquire a database advisory transaction lock for `frontlane-discovery-budget`, count ledger entries in half-open UTC day/month ranges, reject exhausted limits, allocate and advance query progress, insert a request reservation, commit, and release. Do not accept the refresh route's long-lived client as a substitute for an independently committed reservation.
+- [x] Run `node --test tests/discovery-budget.test.mjs`; confirm it fails before implementation.
+- [x] Implement one short owned transaction: acquire a database advisory transaction lock for `frontlane-discovery-budget`, count ledger entries in half-open UTC day/month ranges, reject exhausted limits, allocate and advance query progress, insert a request reservation, commit, and release. Do not accept the refresh route's long-lived client as a substitute for an independently committed reservation.
 
 ```js
 const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -141,8 +141,8 @@ const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 
 // Always ROLLBACK unfinished work and release the owned client in finally.
 ```
 
-- [ ] Verify that reserved requests remain counted when orchestration throws or its separate transaction rolls back. Test release on reservation errors and no query advancement when denied.
-- [ ] Run `node --test tests/discovery-budget.test.mjs tests/employers.test.mjs`; commit the durable budget change.
+- [x] Verify that reserved requests remain counted when orchestration throws or its separate transaction rolls back. Test release on reservation errors and no query advancement when denied.
+- [x] Run `node --test tests/discovery-budget.test.mjs tests/employers.test.mjs`; commit the durable budget change.
 
 ### Task 3: Safe board parsing and employer verification
 
@@ -154,7 +154,7 @@ const monthEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 
 - `verifyCandidate(candidate, {signal, fetchImpl=fetch, now=new Date()}) -> Promise<{status:'verified'|'no-match'|'pending'|'failed', company?, matched?, error?}>`.
 - `smartRecruitersJobs(slug, fetchJson, eligible, target, {signal}={})` combines caller cancellation with its existing bounded timeout.
 
-- [ ] Write failing parser tests for known job and board URLs, Greenhouse embedded `for` board URLs, SmartRecruiters case preservation, URL credentials, encoded path separators, nested deceptive hostnames, reserved paths, unsupported Ashby URLs, and invalid identifiers.
+- [x] Write failing parser tests for known job and board URLs, Greenhouse embedded `for` board URLs, SmartRecruiters case preservation, URL credentials, encoded path separators, nested deceptive hostnames, reserved paths, unsupported Ashby URLs, and invalid identifiers.
 
 ```js
 test('search URLs cannot redirect verification to an arbitrary host', () => {
@@ -165,12 +165,12 @@ test('search URLs cannot redirect verification to an arbitrary host', () => {
 });
 ```
 
-- [ ] Run `node --test tests/board-discovery.test.mjs`; confirm missing exports fail.
-- [ ] Implement exact HTTPS host matching for `boards.greenhouse.io`, `job-boards.greenhouse.io`, `jobs.lever.co`, and `jobs.smartrecruiters.com`. Decode only the relevant board segment, then validate against bounded provider identifier patterns. Normalize source identity to lowercase and retain the original slug for requests. Reject unexpected URL shapes instead of extracting any first segment.
-- [ ] Fetch identity only through constructed supported endpoints with redirects rejected: Greenhouse board metadata `name`; SmartRecruiters live listing/detail company metadata; Lever official board HTML with a bounded response body and a recognized employer title pattern. Empty, ambiguous, or overly long metadata stays pending. Do not use search titles or prettified slugs as company names.
-- [ ] Refactor feed fetching to accept an injected fetch function and combined deadline signal. Preserve existing behavior without options. Preserve SmartRecruiters company metadata for verification without changing published `JobInput` fields. Enforce verification feed application URLs belonging to the candidate board when hosted on an ATS; custom employer application links require a corroborated identity and stay pending if attribution cannot be established.
-- [ ] Add tests for valid identity plus eligible job, missing identity, title-only attribution rejection, metadata with invalid types, empty feeds, geographic restrictions, failed APIs, redirect rejection, and aborted SmartRecruiters pagination preserving old source jobs.
-- [ ] Run `node --test tests/board-discovery.test.mjs tests/sources.test.mjs tests/ingestion.test.mjs`; commit safe board verification.
+- [x] Run `node --test tests/board-discovery.test.mjs`; confirm missing exports fail.
+- [x] Implement exact HTTPS host matching for `boards.greenhouse.io`, `job-boards.greenhouse.io`, `jobs.lever.co`, and `jobs.smartrecruiters.com`. Decode only the relevant board segment, then validate against bounded provider identifier patterns. Normalize source identity to lowercase and retain the original slug for requests. Reject unexpected URL shapes instead of extracting any first segment.
+- [x] Fetch identity only through constructed supported endpoints with redirects rejected: Greenhouse board metadata `name`; SmartRecruiters live listing/detail company metadata; Lever official board HTML with a bounded response body and a recognized employer title pattern. Empty, ambiguous, or overly long metadata stays pending. Do not use search titles or prettified slugs as company names.
+- [x] Refactor feed fetching to accept an injected fetch function and combined deadline signal. Preserve existing behavior without options. Preserve SmartRecruiters company metadata for verification without changing published `JobInput` fields. Enforce verification feed application URLs belonging to the candidate board when hosted on an ATS; custom employer application links require a corroborated identity and stay pending if attribution cannot be established.
+- [x] Add tests for valid identity plus eligible job, missing identity, title-only attribution rejection, metadata with invalid types, empty feeds, geographic restrictions, failed APIs, redirect rejection, and aborted SmartRecruiters pagination preserving old source jobs.
+- [x] Run `node --test tests/board-discovery.test.mjs tests/sources.test.mjs tests/ingestion.test.mjs`; commit safe board verification.
 
 ### Task 4: Bounded Brave discovery orchestration
 
@@ -181,7 +181,7 @@ test('search URLs cannot redirect verification to an arbitrary host', () => {
 - `runDiscovery(db, {apiKey, fetchImpl=fetch, now=()=>new Date(), timeoutMs=20000}={}) -> Promise<DiscoverySummary>`.
 - Summary fields: `runId`, `status`, `searchesReserved`, `searchesSucceeded`, `candidatesAdded`, `verified`, `registered`, `noMatch`, `pending`, `failed`, `deferred`, and `allowance`.
 
-- [ ] Write an end-to-end failing test that returns a search result for a previously unknown board, supplies trusted identity plus an eligible live job, runs discovery, loads the registry, runs refresh through ingestion, and asserts the new employer's job is active.
+- [x] Write an end-to-end failing test that returns a search result for a previously unknown board, supplies trusted identity plus an eligible live job, runs discovery, loads the registry, runs refresh through ingestion, and asserts the new employer's job is active.
 
 ```js
 const fixedClock = () => new Date();
@@ -208,13 +208,13 @@ await refreshSources(batch => ingest(batch, db), {sources, fetchImpl: verifiedEm
 assert.equal((await db.query("SELECT count(*)::int AS count FROM jobs WHERE active AND source='greenhouse:newco'")).rows[0].count, 1);
 ```
 
-- [ ] Run `node --test tests/discovery.test.mjs`; confirm discovery does not exist yet.
-- [ ] Define the query catalog in code from supported ATS hosts, six role phrases, and India/worldwide-remote variants. Use persisted reservation query indices to cycle through catalog entries and broad/recent searches. The first version uses one result page per query; no implicit pagination or HTTP retries.
-- [ ] Send each Brave request to `https://api.search.brave.com/res/v1/web/search` with `q`, `count=20`, `country=IN`, `search_lang=en`, and optional freshness. Set `X-Subscription-Token` from the server-only key. Reserve before every HTTP attempt and enforce the two-attempt invocation limit. Validate `web.results` as a bounded array of URL-bearing objects; ignore malformed individual URLs, but record malformed top-level responses as failures. Never log the header or full error responses.
-- [ ] Claim an expiring run lease before work. Use a monotonic deadline for elapsed work and UTC timestamps for storage. Give HTTP calls at most six seconds and combine that timeout with the invocation signal. Process a verification batch before search so a search backlog cannot starve pending candidates; use remaining time for at most two searches and optional newly added candidate verification, with four verifications total. Stop starting work when insufficient time remains.
-- [ ] Save candidate progress and a bounded run summary independently. Missing keys produce a clear skipped-search summary with zero reservations; pending verification can still advance. Exhausted budgets stop searching but allow queued verification. Failed persistence must surface as an error, not as a successful discovery receipt. Complete only leases owned by the current run token.
-- [ ] Test quota exhaustion, missing key, 429/503/timeouts consuming reservations, malformed results, duplicate boards, query rotation after partial work, stale result with no live eligible job, no invented posting dates, deadline deferral, crashed/expired leases, and secrets excluded from summaries.
-- [ ] Run `node --test tests/discovery.test.mjs tests/discovery-budget.test.mjs tests/board-discovery.test.mjs`; commit discovery orchestration.
+- [x] Run `node --test tests/discovery.test.mjs`; confirm discovery does not exist yet.
+- [x] Define the query catalog in code from supported ATS hosts, six role phrases, and India/worldwide-remote variants. Use persisted reservation query indices to cycle through catalog entries and broad/recent searches. The first version uses one result page per query; no implicit pagination or HTTP retries.
+- [x] Send each Brave request to `https://api.search.brave.com/res/v1/web/search` with `q`, `count=20`, `country=IN`, `search_lang=en`, and optional freshness. Set `X-Subscription-Token` from the server-only key. Reserve before every HTTP attempt and enforce the two-attempt invocation limit. Validate `web.results` as a bounded array of URL-bearing objects; ignore malformed individual URLs, but record malformed top-level responses as failures. Never log the header or full error responses.
+- [x] Claim an expiring run lease before work. Use a monotonic deadline for elapsed work and UTC timestamps for storage. Give HTTP calls at most six seconds and combine that timeout with the invocation signal. Process a verification batch before search so a search backlog cannot starve pending candidates; use remaining time for at most two searches and optional newly added candidate verification, with four verifications total. Stop starting work when insufficient time remains.
+- [x] Save candidate progress and a bounded run summary independently. Missing keys produce a clear skipped-search summary with zero reservations; pending verification can still advance. Exhausted budgets stop searching but allow queued verification. Failed persistence must surface as an error, not as a successful discovery receipt. Complete only leases owned by the current run token.
+- [x] Test quota exhaustion, missing key, 429/503/timeouts consuming reservations, malformed results, duplicate boards, query rotation after partial work, stale result with no live eligible job, no invented posting dates, deadline deferral, crashed/expired leases, and secrets excluded from summaries.
+- [x] Run `node --test tests/discovery.test.mjs tests/discovery-budget.test.mjs tests/board-discovery.test.mjs`; commit discovery orchestration.
 
 ### Task 5: Registry-backed regular refresh
 
@@ -225,7 +225,7 @@ assert.equal((await db.query("SELECT count(*)::int AS count FROM jobs WHERE acti
 - Protected `GET /api/ingest/sources` returns `{sources, deferred, rotation}` to `INGEST_TOKEN` callers.
 - Protected `POST /api/ingest/sources` accepts `{checkedSources:string[]}` with at most 100 supported source IDs and records attempted checks for registered sources only.
 
-- [ ] Add failing tests proving the server and worker both include a discovered employer, discovery selection is capped at 20, sources waiting their turn retain jobs, and rotating selection includes an employer beyond position 50.
+- [x] Add failing tests proving the server and worker both include a discovered employer, discovery selection is capped at 20, sources waiting their turn retain jobs, and rotating selection includes an employer beyond position 50.
 
 ```js
 test('rotating employer order includes sources beyond the first fifty', async t => {
@@ -241,12 +241,12 @@ test('rotating employer order includes sources beyond the first fifty', async t 
 });
 ```
 
-- [ ] Run `node --test tests/sources.test.mjs tests/worker.test.mjs tests/routes.test.mjs`; confirm new registry integration assertions fail.
-- [ ] Read the installed Next.js route-handler and route-segment configuration documentation before changing routes. Seed trusted sources and load the registry using the existing refresh lock client. Rotate the source array using a UTC date-derived offset before the existing round-robin job selection. Use existing sources plus up to 20 discovered sources ordered by least recent attempt. Update attempted check timestamps for completed and failed sources; do not mark deferred sources checked.
-- [ ] Add source-list GET/acknowledgement POST routes with authentication before database access and strict request validation. Return no pending candidate evidence. Acknowledge worker failures too, so unhealthy boards cannot permanently occupy the first 20 discovery slots.
-- [ ] Make the worker fetch the protected registry endpoint before employer APIs, validate returned source tuples, pass them to `refreshSources`, publish through the existing ingestion endpoint, persist failure statuses, and acknowledge attempted registered sources. If source-list retrieval fails, exit unsuccessfully instead of silently using only the fixed list.
-- [ ] Update worker preload fixtures to distinguish registry GET, acknowledgement POST, status POST, and ingestion POST. Add interrupted-feed regression coverage: a partial successful page followed by abort/failure must not replace that source's snapshot. Keep research-source and tracker tests intact.
-- [ ] Run `node --test tests/sources.test.mjs tests/worker.test.mjs tests/routes.test.mjs tests/ingestion.test.mjs`; commit registry-backed refresh.
+- [x] Run `node --test tests/sources.test.mjs tests/worker.test.mjs tests/routes.test.mjs`; confirm new registry integration assertions fail.
+- [x] Read the installed Next.js route-handler and route-segment configuration documentation before changing routes. Seed trusted sources and load the registry using the existing refresh lock client. Rotate the source array using a UTC date-derived offset before the existing round-robin job selection. Use existing sources plus up to 20 discovered sources ordered by least recent attempt. Update attempted check timestamps for completed and failed sources; do not mark deferred sources checked.
+- [x] Add source-list GET/acknowledgement POST routes with authentication before database access and strict request validation. Return no pending candidate evidence. Acknowledge worker failures too, so unhealthy boards cannot permanently occupy the first 20 discovery slots.
+- [x] Make the worker fetch the protected registry endpoint before employer APIs, validate returned source tuples, pass them to `refreshSources`, publish through the existing ingestion endpoint, persist failure statuses, and acknowledge attempted registered sources. If source-list retrieval fails, exit unsuccessfully instead of silently using only the fixed list.
+- [x] Update worker preload fixtures to distinguish registry GET, acknowledgement POST, status POST, and ingestion POST. Add interrupted-feed regression coverage: a partial successful page followed by abort/failure must not replace that source's snapshot. Keep research-source and tracker tests intact.
+- [x] Run `node --test tests/sources.test.mjs tests/worker.test.mjs tests/routes.test.mjs tests/ingestion.test.mjs`; commit registry-backed refresh.
 
 ### Task 6: Protected discovery route and worker command
 
@@ -256,7 +256,7 @@ test('rotating employer order includes sources beyond the first fifty', async t 
 - `GET /api/cron/discovery` uses `CRON_SECRET` and returns the saved summary with `Cache-Control: no-store`.
 - `pnpm jobs:discover` invokes that endpoint with `APP_URL` and `CRON_SECRET` and prints its receipt.
 
-- [ ] Write failing authorization tests that assert no database/search access for missing or invalid tokens, missing-key zero quota usage, bounded success, lease contention, and database failure. Add subprocess worker tests for missing configuration, correct authorization, timeout, malformed receipts, and non-success HTTP statuses.
+- [x] Write failing authorization tests that assert no database/search access for missing or invalid tokens, missing-key zero quota usage, bounded success, lease contention, and database failure. Add subprocess worker tests for missing configuration, correct authorization, timeout, malformed receipts, and non-success HTTP statuses.
 
 ```js
 const response = await discoveryRoute.GET(new Request('https://frontlane.example/api/cron/discovery'));
@@ -265,10 +265,10 @@ assert.equal(searchRequests, 0);
 assert.equal(databaseQueries, 0);
 ```
 
-- [ ] Run `node --test tests/routes.test.mjs tests/worker.test.mjs`; confirm new entry points fail.
-- [ ] Implement the route with `runtime='nodejs'`, `maxDuration=30`, authentication first, and a 20-second core deadline. Return 202 for an occupied run lease, 200 for a persisted result including skipped/exhausted/partial statuses, and 503 for unavailable persistence. Public error bodies use a fixed generic message.
-- [ ] Implement the command with configuration validation, a 30-second request timeout, a fixed endpoint path, server-secret authorization, receipt validation, and nonzero exit status for HTTP/configuration errors. Add root and worker scripts using the existing environment-loading pattern. Do not supply the Brave key to the command.
-- [ ] Run `node --test tests/routes.test.mjs tests/worker.test.mjs tests/monorepo.test.mjs`; commit discovery entry points.
+- [x] Run `node --test tests/routes.test.mjs tests/worker.test.mjs`; confirm new entry points fail.
+- [x] Implement the route with `runtime='nodejs'`, `maxDuration=30`, authentication first, and a 20-second core deadline. Return 202 for an occupied run lease, 200 for a persisted result including skipped/exhausted/partial statuses, and 503 for unavailable persistence. Public error bodies use a fixed generic message.
+- [x] Implement the command with configuration validation, a 30-second request timeout, a fixed endpoint path, server-secret authorization, receipt validation, and nonzero exit status for HTTP/configuration errors. Add root and worker scripts using the existing environment-loading pattern. Do not supply the Brave key to the command.
+- [x] Run `node --test tests/routes.test.mjs tests/worker.test.mjs tests/monorepo.test.mjs`; commit discovery entry points.
 
 ### Task 7: Public discovery summary and operating instructions
 
@@ -276,9 +276,9 @@ assert.equal(databaseQueries, 0);
 
 **Interfaces:** The page consumes `discoveryPublicSummary` and existing `source_checks`; no new public API is needed.
 
-- [ ] Add a focused aggregate-query test proving no pending candidate queries, URLs, or secret values appear in `discoveryPublicSummary` and that no discovery runs yields an empty state.
-- [ ] Run `node --test tests/employers.test.mjs`; confirm the summary expectation fails if it is not yet implemented.
-- [ ] Add a small discovery section using existing page classes: last run in IST, newly registered employers from that run, total discovered registered employers, and a plain status for skipped/pending/failed work. Preserve existing source-check display. Distinguish selection target from total active jobs and describe how new employers join monitoring.
+- [x] Add a focused aggregate-query test proving no pending candidate queries, URLs, or secret values appear in `discoveryPublicSummary` and that no discovery runs yields an empty state.
+- [x] Run `node --test tests/employers.test.mjs`; confirm the summary expectation fails if it is not yet implemented.
+- [x] Add a small discovery section using existing page classes: last run in IST, newly registered employers from that run, total discovered registered employers, and a plain status for skipped/pending/failed work. Preserve existing source-check display. Distinguish selection target from total active jobs and describe how new employers join monitoring.
 
 ```tsx
 <h2>Company discovery</h2>
@@ -287,19 +287,19 @@ assert.equal(databaseQueries, 0);
   : 'No company discovery runs have completed yet.'}</p>
 ```
 
-- [ ] Add `BRAVE_SEARCH_API_KEY=` to `.env.example`. Document UTC caps, separately committed failed-attempt reservations, provider billing limits, a dedicated key, supported providers, pending identity results, missing-key operation, migration, `pnpm jobs:discover`, and an hourly scheduler calling the protected discovery route with response-body storage off. Keep the existing daily jobs scheduler separate and enabled once.
-- [ ] Explain the at-most-20 discovered employer refresh window, how failed attempts rotate, why the total active board can exceed 50, and that unsupported/custom careers pages remain outside automatic discovery. Include precise production activation steps without claiming they ran.
-- [ ] Run `pnpm typecheck`, `pnpm test`, and `pnpm build`. Inspect `/updates` with no discovery runs and a populated fixture at mobile/desktop sizes and both themes. Prefer available browser tooling; do not expose credentials to the browser. Commit UI and operational documentation.
+- [x] Add `BRAVE_SEARCH_API_KEY=` to `.env.example`. Document UTC caps, separately committed failed-attempt reservations, provider billing limits, a dedicated key, supported providers, pending identity results, missing-key operation, migration, `pnpm jobs:discover`, and an hourly scheduler calling the protected discovery route with response-body storage off. Keep the existing daily jobs scheduler separate and enabled once.
+- [x] Explain the at-most-20 discovered employer refresh window, how failed attempts rotate, why the total active board can exceed 50, and that unsupported/custom careers pages remain outside automatic discovery. Include precise production activation steps without claiming they ran.
+- [x] Run `pnpm typecheck`, `pnpm test`, and `pnpm build`. Inspect `/updates` with no discovery runs and a populated fixture at mobile/desktop sizes and both themes. Prefer available browser tooling; do not expose credentials to the browser. Commit UI and operational documentation.
 
 ### Task 8: Final verification and review handoff
 
 **Files:** Update this plan's checkboxes and the operational document only if verification uncovers a real change.
 
-- [ ] Reconcile every acceptance condition with an executed test or manual check: request caps; durable failed-attempt accounting; safe identity verification; resumable work; discovered employer registration; both refresh paths; partial-feed preservation; fairness; aggregate public status.
-- [ ] Run the required full checks once after final code changes: `pnpm typecheck`, `pnpm test`, `pnpm build`. Do not repeat passing checks without an intervening change or unresolved concern.
-- [ ] Inspect `git diff --check`, package exports, lockfile changes, and the full branch diff. Confirm no real secrets or generated credential files were added. Review against the five Review Focus cases.
-- [ ] Use the required code-review workflow at execution time. Native execution uses one fresh whole-branch reviewer after implementation; subagent execution uses its prescribed per-task reviewers and final review. Address findings with regression tests for demonstrated defects.
-- [ ] Report implementation files, test results, and the exact remaining activation requirements: configure the Brave key, apply production schema, deploy, configure the discovery schedule, run live discovery, and verify the subsequent published jobs. Do not label production discovery operational without those receipts.
+- [x] Reconcile every acceptance condition with an executed test or manual check: request caps; durable failed-attempt accounting; safe identity verification; resumable work; discovered employer registration; both refresh paths; partial-feed preservation; fairness; aggregate public status.
+- [x] Run the required full checks once after final code changes: `pnpm typecheck`, `pnpm test`, `pnpm build`. Do not repeat passing checks without an intervening change or unresolved concern.
+- [x] Inspect `git diff --check`, package exports, lockfile changes, and the full branch diff. Confirm no real secrets or generated credential files were added. Review against the five Review Focus cases.
+- [x] Use the required code-review workflow at execution time. Native execution uses one fresh whole-branch reviewer after implementation; subagent execution uses its prescribed per-task reviewers and final review. Address findings with regression tests for demonstrated defects.
+- [x] Report implementation files, test results, and the exact remaining activation requirements: configure the Brave key, apply production schema, deploy, configure the discovery schedule, run live discovery, and verify the subsequent published jobs. Do not label production discovery operational without those receipts.
 
 ## Self-review result
 

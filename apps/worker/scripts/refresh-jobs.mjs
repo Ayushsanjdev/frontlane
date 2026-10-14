@@ -1,7 +1,13 @@
 import {refreshSources,refreshSummary} from '@frontlanejobs/core/sources';
+import {validateSourceSelection} from '@frontlanejobs/core/employers';
 
 const base=process.env.APP_URL,token=process.env.INGEST_TOKEN;
 if(!base||!token||token.length<32)throw Error('Set APP_URL and INGEST_TOKEN');
+const registry=await fetch(new URL('/api/ingest/sources',base),{
+  headers:{Authorization:'Bearer '+token},signal:AbortSignal.timeout(30000),redirect:'error',
+});
+if(!registry.ok)throw Error('Employer registry HTTP '+registry.status);
+const selection=validateSourceSelection(await registry.json());
 const sources=await refreshSources(async batch=>{
   const response=await fetch(new URL('/api/ingest/jobs',base),{
     method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
@@ -9,7 +15,16 @@ const sources=await refreshSources(async batch=>{
   });
   if(!response.ok)throw Error('Publish HTTP '+response.status);
   return response.json();
-});
+},{sources:selection.sources,rotation:selection.rotation});
+try{
+  const response=await fetch(new URL('/api/ingest/sources',base),{
+    method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+    body:JSON.stringify({checkedSources:sources.map(row=>row.source),selectedSources:sources.filter(row=>row.status==='ok'&&row.matched>0).map(row=>row.source)}),signal:AbortSignal.timeout(15000),redirect:'error',
+  });
+  if(!response.ok)throw Error('HTTP '+response.status);
+}catch{
+  console.error('Employer check acknowledgements could not be persisted.');process.exitCode=1;
+}
 const failed=sources.filter(source=>source.status==='failed').map(source=>source.source);
 for(let offset=0;offset<failed.length;offset+=20){
   try{
@@ -24,6 +39,6 @@ for(let offset=0;offset<failed.length;offset+=20){
   }
 }
 const summary=refreshSummary(sources);
-console.log(JSON.stringify({sources,summary}));
+console.log(JSON.stringify({sources,summary,deferredEmployers:selection.deferred}));
 if(summary.shortfall)console.error(`Daily selection: published ${summary.published}/${summary.target} jobs; shortfall ${summary.shortfall}.`);
 if(sources.every(source=>source.status==='failed'))process.exitCode=1;

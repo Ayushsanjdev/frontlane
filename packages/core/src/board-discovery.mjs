@@ -37,7 +37,7 @@ async function readResponse(url,fetchImpl,signal,{html=false}={}){
 function companyName(value){
   if(typeof value!=='string')return null;
   const name=clean(value).trim();
-  return name.length>1&&name.length<=120&&!/https?:|<|>|\b(frontend engineer|job search)\b/i.test(name)?name:null;
+  return name.length>1&&name.length<=120&&!/https?:|<|>|\b((?:frontend|react|angular|vue|ui|web|software)\s+(?:engineer|developer)|job search|access denied|not found|error|loading)\b/i.test(name)?name:null;
 }
 
 export async function verifyCandidate(candidate,{signal,fetchImpl=fetch,now=new Date()}={}){
@@ -53,6 +53,10 @@ export async function verifyCandidate(candidate,{signal,fetchImpl=fetch,now=new 
       const html=await readResponse(board.boardUrl,fetchImpl,signal,{html:true});
       const title=clean(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]||'');
       company=companyName(title.match(/^Jobs at (.+)$/i)?.[1]||title.match(/^(.+?)\s*[-–|]\s*(?:Jobs|Careers|Job openings)$/i)?.[1]);
+      if(!company){
+        const metadata=html.match(/<meta\b[^>]*property=["']og:title["'][^>]*content=["']([^"']+)["'][^>]*>/i)?.[1]||html.match(/<meta\b[^>]*content=["']([^"']+)["'][^>]*property=["']og:title["'][^>]*>/i)?.[1];
+        if(metadata&&clean(metadata).trim()===title)company=companyName(title);
+      }
     }else{
       const data=await readResponse(`https://api.smartrecruiters.com/v1/companies/${slug}/postings?country=in&limit=1`,fetchImpl,signal);
       company=companyName(data.content?.[0]?.company?.name);

@@ -30,9 +30,9 @@ export async function load(url,context,next){
     return {format:'module',source:'export function database(){return globalThis.__frontlaneRouteTest.db}',shortCircuit:true};
   }
   if(url.endsWith('.json'))return {format:'module',source:'export default '+await readFile(new URL(url),'utf8'),shortCircuit:true};
-  if(url.endsWith('.ts')){
+  if(url.endsWith('.ts')||url.endsWith('.tsx')){
     const source=await readFile(new URL(url),'utf8');
-    return {format:'module',source:ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022}}).outputText,shortCircuit:true};
+    return {format:'module',source:ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.ESNext,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText,shortCircuit:true};
   }
   return next(url,context);
 }

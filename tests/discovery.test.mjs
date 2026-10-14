@@ -71,3 +71,32 @@ test('deadline and malformed search responses never register unverified candidat
     assert.equal(malformed.registered,0);assert.equal(malformed.failed,2);assert.equal(malformed.searchesReserved,2);
   }finally{await f.close()}
 });
+
+test('expired work deadlines skip seeding and use bounded database query budgets',async()=>{
+  const f=await discoveryDatabase();
+  let seeds=0,timedQueries=0;
+  const query=async(input,args)=>{
+    const sql=typeof input==='string'?input:input.text;
+    if(typeof input==='object'&&input.query_timeout>0)timedQueries++;
+    if(sql.includes('INSERT INTO employer_sources'))seeds++;
+    await new Promise(resolve=>setTimeout(resolve,2));
+    return f.db.query(input,args);
+  };
+  try{
+    const result=await runDiscovery({...f.db,query},{timeoutMs:1});
+    assert.equal(result.searchesReserved,0);assert.equal(seeds,0);assert.ok(timedQueries>0);
+  }finally{await f.close()}
+});
+
+test('a search page persists its candidates in one bounded database statement',async()=>{
+  const f=await discoveryDatabase();let writes=0;
+  const query=async(input,args)=>{
+    const sql=typeof input==='string'?input:input.text;
+    if(sql.includes('INSERT INTO discovery_candidates'))writes++;
+    return f.db.query(input,args);
+  };
+  try{
+    const result=await runDiscovery({...f.db,query},{apiKey:'fixture-key',fetchImpl:discoveryFixture});
+    assert.equal(result.candidatesAdded,1);assert.equal(writes,2);
+  }finally{await f.close()}
+});
