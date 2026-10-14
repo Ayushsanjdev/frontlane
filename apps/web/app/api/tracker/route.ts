@@ -1,6 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {database} from '@frontlanejobs/database/client';
-import {parseApplication,parseRemoval} from '@frontlanejobs/core/tracker';
+import {parseApplication,parseRemoval,parseSave} from '@frontlanejobs/core/tracker';
 import {identity,failure,boundedJson} from '@/lib/auth-api';
 
 export async function GET(request:Request){
@@ -14,9 +14,12 @@ export async function GET(request:Request){
 export async function POST(request:Request){
   try{
     const userId=await identity(request,true);
-    const input=parseApplication(await boundedJson(request));
+    const body=await boundedJson(request);
+    const saving=body?.action!==undefined;
+    const input=saving?parseSave(body):parseApplication(body);
     const item={...input,id:randomUUID(),updatedAt:new Date().toISOString()};
     const result=await database().query(
+      saving?"INSERT INTO applications(id,user_id,job_id,payload) VALUES($1,$2,$3,$4) ON CONFLICT(user_id,job_id) DO UPDATE SET payload=applications.payload RETURNING payload":
       "INSERT INTO applications(id,user_id,job_id,payload) VALUES($1,$2,$3,$4) ON CONFLICT(user_id,job_id) DO UPDATE SET payload=jsonb_set(excluded.payload,'{id}',to_jsonb(applications.id::text)),updated_at=now() RETURNING payload",
       [item.id,userId,item.jobId,item]
     );

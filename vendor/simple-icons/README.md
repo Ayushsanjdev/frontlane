@@ -1,0 +1,1 @@
+Framework logos in `apps/web/public/stack-logos/` are from Simple Icons 15.0.0 (https://github.com/simple-icons/simple-icons/tree/15.0.0), distributed under CC0. See LICENSE.md. Brand trademarks remain the property of their respective owners.

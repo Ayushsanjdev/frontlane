@@ -25,7 +25,8 @@
     "tailwind-merge": "3.6.0",
     "zod": "^3.25.76",
     "@frontlanejobs/core": "workspace:*",
-    "@frontlanejobs/database": "workspace:*"
+    "@frontlanejobs/database": "workspace:*",
+    "@frontlanejobs/contracts": "workspace:*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.1",

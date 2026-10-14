@@ -16,11 +16,13 @@
     "./viewers": "./src/viewers.mjs",
     "./employers": "./src/employers.mjs",
     "./discovery": "./src/discovery.mjs",
-    "./public-jobs": "./src/public-jobs.mjs"
+    "./public-jobs": "./src/public-jobs.mjs",
+    "./mobile-sessions": "./src/mobile-sessions.mjs"
   },
   "dependencies": {
     "@frontlanejobs/database": "workspace:*",
     "entities": "^8.1.0",
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "jose": "6.2.2"
   }
 }

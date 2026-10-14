@@ -7,8 +7,10 @@ A careers app for frontend engineers in India, built with Next.js, React, TypeSc
 | Path | Responsibility |
 | --- | --- |
 | `apps/web/` | Next.js pages, APIs, authentication, and UI |
+| `apps/mobile/` | Expo React Native app for iOS and Android |
 | `apps/worker/` | Employer-feed refresh and research publication commands |
 | `packages/core/` | Shared validation, queries, ingestion, and source adapters |
+| `packages/contracts/` | Frontend-safe API types shared by web and mobile |
 | `packages/database/` | PostgreSQL access, schema, migrations, and curated data |
 | `scripts/` | Seed orchestration |
 | `tests/` | Unit and integration tests |
@@ -56,6 +58,10 @@ Open [localhost:3000](http://localhost:3000). Local web and worker commands load
 Add dependencies to the workspace that imports them, for example `pnpm --filter @frontlanejobs/web add <package>`. Use package exports and `workspace:*` dependencies across workspace boundaries. Keep `pnpm-lock.yaml` as the only lockfile.
 
 Before submitting changes, run `pnpm typecheck`, `pnpm test`, and `pnpm build`. Database integration tests use PGlite and do not require a running PostgreSQL server. For UI changes, check responsive layouts and both themes. See [AGENTS.md](AGENTS.md) for contributor guidelines.
+
+## Mobile app
+
+The native Expo app includes job search, Google sign-in, a synced private tracker, profile editing, community job posting, and light/dark themes. Start it with `pnpm mobile:ios` or `pnpm mobile:android`, then use `pnpm mobile:dev` for subsequent development sessions. Google sign-in uses a development build. See [mobile setup and OAuth configuration](docs/MOBILE.md) before building.
 
 ## PostgreSQL and Neon
 

@@ -130,3 +130,87 @@ test('status endpoint records a failed SmartRecruiters feed',async()=>{
  assert.equal(response.status,200);
  assert.deepEqual(recorded,['smartrecruiters:nagarro1']);
 });
+
+test('mobile bearer writes use token account and invalid bearer never falls back to browser session',async()=>{
+ const token='a'.repeat(43);
+ const calls=[];
+ globalThis.__frontlaneRouteTest.db={query:async(sql,args)=>{
+  calls.push(sql);
+  if(sql.startsWith('SELECT user_id,payload,expires_at'))return {rows:[{user_id:'google:mobile',payload:{name:'Mobile'},expires_at:new Date(Date.now()+86400000)}]};
+  assert.equal(args[0],'google:mobile');
+  return {rows:[]};
+ }};
+ assert.equal((await profile.POST(new Request('http://localhost:3000/api/profile',{method:'POST',headers:{authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{"name":"Mobile"}'}))).status,200);
+ const count=calls.length;
+ assert.equal((await profile.POST(new Request('http://localhost:3000/api/profile',{method:'POST',headers:{authorization:'Bearer invalid',origin:'http://localhost:3000'},body:'{}'}))).status,401);
+ assert.equal(calls.length,count);
+ globalThis.__frontlaneRouteTest.db={query:async()=>({rows:[]})};
+ assert.equal((await tracker.GET(new Request('http://localhost:3000/api/tracker',{headers:{authorization:'Bearer '+token}}))).status,401);
+});
+
+test('mobile sessions enforce profile and tracker isolation and revoke through the API',async()=>{
+ const {PGlite}=await import('@electric-sql/pglite');
+ const {readFile}=await import('node:fs/promises');
+ const {createMobileSession}=await import('@frontlanejobs/core/mobile-sessions');
+ const mobile=await route('mobile/session');
+ const db=new PGlite();
+ try{
+  await db.exec(await readFile(new URL('../packages/database/schema/001-init.sql',import.meta.url),'utf8'));
+  await db.exec(await readFile(new URL('../packages/database/schema/004-mobile-sessions.sql',import.meta.url),'utf8'));
+  globalThis.__frontlaneRouteTest.db=db;
+  const a=await createMobileSession(db,{userId:'google:alice',name:'Alice',email:'alice@example.com'});
+  const b=await createMobileSession(db,{userId:'google:bob',name:'Bob',email:'bob@example.com'});
+  const native=(path,token,method='GET',body)=>new Request('http://localhost:3000/api/'+path,{method,headers:{authorization:'Bearer '+token,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
+  assert.equal((await profile.POST(native('profile',a.token,'POST',{name:'Alice private'}))).status,200);
+  assert.deepEqual(await (await profile.GET(native('profile',b.token))).json(),{});
+  const saved=await (await tracker.POST(native('tracker',a.token,'POST',{job,stage:'Saved'}))).json();
+  assert.deepEqual(await (await tracker.GET(native('tracker',b.token))).json(),[]);
+  await tracker.DELETE(native('tracker',b.token,'DELETE',{id:saved.id}));
+  assert.equal((await (await tracker.GET(native('tracker',a.token))).json()).length,1);
+  assert.equal((await (await mobile.GET(native('mobile/session',a.token))).json()).user.userId,'google:alice');
+  assert.equal((await mobile.DELETE(native('mobile/session',a.token,'DELETE'))).status,200);
+  assert.equal((await mobile.GET(native('mobile/session',a.token))).status,401);
+  assert.equal((await tracker.GET(native('tracker',a.token))).status,401);
+  assert.equal((await mobile.GET(native('mobile/session',b.token))).status,200);
+  assert.equal((await mobile.GET(new Request('http://localhost:3000/api/mobile/session'))).status,401);
+ }finally{await db.close()}
+});
+
+test('mobile exchange rejects invalid input and missing OAuth configuration without exposing internals',async()=>{
+ const mobile=await route('mobile/session');
+ const previous=process.env.MOBILE_GOOGLE_AUDIENCE,previousWeb=process.env.AUTH_GOOGLE_ID;
+ try{
+  process.env.MOBILE_GOOGLE_AUDIENCE='';process.env.AUTH_GOOGLE_ID='';
+  const req=body=>new Request('http://localhost:3000/api/mobile/session',{method:'POST',body});
+  assert.equal((await mobile.POST(req('{'))).status,400);
+  assert.equal((await mobile.POST(req('{"idToken":123}'))).status,400);
+  assert.equal((await mobile.POST(req('{"idToken":"fake","extra":true}'))).status,400);
+  assert.equal((await mobile.POST(req('{"idToken":"fake"}'))).status,503);
+  process.env.MOBILE_GOOGLE_AUDIENCE='test-client';
+  const invalid=await mobile.POST(req('{"idToken":"fake"}'));
+  assert.equal(invalid.status,401);
+  assert.equal(invalid.headers.get('cache-control'),'no-store');
+ }finally{
+  if(previous===undefined)delete process.env.MOBILE_GOOGLE_AUDIENCE;else process.env.MOBILE_GOOGLE_AUDIENCE=previous;
+  if(previousWeb===undefined)delete process.env.AUTH_GOOGLE_ID;else process.env.AUTH_GOOGLE_ID=previousWeb;
+ }
+});
+
+test('initial saving is atomic and preserves a concurrent application edit',async()=>{
+ const {PGlite}=await import('@electric-sql/pglite');const {readFile}=await import('node:fs/promises');
+ const db=new PGlite();
+ try{
+  await db.exec(await readFile(new URL('../packages/database/schema/001-init.sql',import.meta.url),'utf8'));
+  globalThis.__frontlaneRouteTest.db=db;
+  // A stale mobile list saw no saved role, then the website saved progress.
+  await tracker.POST(request('tracker',{job,stage:'Interview',notes:'Keep my notes',answers:'Private answers',evidence:'Confirmation email',appliedAt:'2026-10-14'}));
+  const response=await tracker.POST(request('tracker',{action:'save',job}));
+  assert.equal(response.status,200);
+  const item=await response.json();
+  assert.equal(item.stage,'Interview');assert.equal(item.notes,'Keep my notes');assert.equal(item.answers,'Private answers');
+  assert.equal(item.evidence,'Confirmation email');assert.equal(item.appliedAt,'2026-10-14');
+  const other={...job,id:'another-role'};
+  const initial=await tracker.POST(request('tracker',{action:'save',job:other}));
+  assert.equal((await initial.json()).stage,'Saved');
+ }finally{await db.close()}
+});

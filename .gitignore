@@ -13,3 +13,9 @@ coverage/
 .neon
 .agents/
 skills-lock.json
+
+# Expo generated state
+/apps/mobile/.expo/
+/apps/mobile/dist/
+/apps/mobile/android/
+/apps/mobile/ios/

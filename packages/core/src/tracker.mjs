@@ -41,3 +41,8 @@ export function parseApplication(input){
   return {...item,jobId:item.jobId||item.job.id};
 }
 export function parseRemoval(input){return z.object({id:z.string().uuid()}).strict().parse(input)}
+
+export function parseSave(input){
+  const {job}=z.object({action:z.literal('save'),job:Job}).strict().parse(input);
+  return parseApplication({job,stage:'Saved'});
+}

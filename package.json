@@ -11,14 +11,18 @@
     "dev": "pnpm --filter @frontlanejobs/web dev",
     "build": "pnpm --filter @frontlanejobs/web build",
     "start": "pnpm --filter @frontlanejobs/web start",
-    "typecheck": "pnpm --filter @frontlanejobs/web typecheck",
+    "typecheck": "pnpm --filter @frontlanejobs/web --filter @frontlanejobs/mobile typecheck",
     "test": "node --test tests/*.test.mjs",
     "test:focused": "node --test tests/reliability.test.mjs tests/routes.test.mjs tests/monorepo.test.mjs tests/worker.test.mjs",
     "db:migrate": "pnpm --filter @frontlanejobs/database migrate",
     "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs",
     "jobs:refresh": "pnpm --filter @frontlanejobs/worker refresh",
     "jobs:discover": "pnpm --filter @frontlanejobs/worker discover",
-    "jobs:publish": "node --env-file-if-exists=.env.local apps/worker/scripts/publish-jobs.mjs"
+    "jobs:publish": "node --env-file-if-exists=.env.local apps/worker/scripts/publish-jobs.mjs",
+    "mobile:dev": "pnpm --filter @frontlanejobs/mobile dev",
+    "mobile:android": "pnpm --filter @frontlanejobs/mobile android",
+    "mobile:ios": "pnpm --filter @frontlanejobs/mobile ios",
+    "mobile:export": "pnpm --filter @frontlanejobs/mobile export"
   },
   "dependencies": {
     "@frontlanejobs/core": "workspace:*",
