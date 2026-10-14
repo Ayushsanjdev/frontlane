@@ -50,6 +50,7 @@ Open [localhost:3000](http://localhost:3000). Local web and worker commands load
 | `pnpm db:migrate` | Apply the database schema |
 | `pnpm db:seed` | Load optional curated jobs |
 | `pnpm jobs:refresh` | Fetch and publish employer feeds |
+| `pnpm jobs:discover` | Discover and verify new employer boards through Brave Search |
 | `pnpm jobs:publish batch.json` | Publish a validated research batch |
 
 Add dependencies to the workspace that imports them, for example `pnpm --filter @frontlanejobs/web add <package>`. Use package exports and `workspace:*` dependencies across workspace boundaries. Keep `pnpm-lock.yaml` as the only lockfile.
@@ -97,6 +98,10 @@ For production, enable **only one** scheduler above. With GitHub Actions, point 
 The external worker needs `APP_URL` and `INGEST_TOKEN`, without database credentials. Failed source retrieval preserves existing jobs. The public `/api/jobs` endpoint is read-only.
 
 For researched jobs, publish a JSON batch with `pnpm jobs:publish batch.json` or authenticated `POST /api/ingest/jobs`. Batch paths resolve from your invoking directory. See [the research publication guide](docs/CHATGPT-UPDATER.md) for the schema, retry behavior, and runner instructions. Automated ChatGPT publication requires a configured authenticated connector or runner.
+
+Automatic employer discovery uses Brave Search with application caps of 30 search attempts per UTC day and 1,000 per UTC calendar month. Configure the server-only `BRAVE_SEARCH_API_KEY`, migrate the database, and enable a separate discovery schedule. Verified new employers join the daily refresh in rotating batches. See [employer discovery setup and operations](docs/EMPLOYER-DISCOVERY.md).
+
+Signed-in members can use **Add a job** beside the jobs-page count and sort control to publish a public community listing. Apply migrations before enabling this version (`003-public-job-posts.sql` stores private publisher attribution and retry receipts). Publications require an HTTPS application link and an eligible frontend role, are limited to ten per account per UTC day, and never appear as employer-verified checks. Retrying an unchanged submission is safe; duplicate application links are rejected. Active employer-feed listings take display priority when the same link is later ingested, while each source retains its own records. Private tracker entries remain separate.
 
 ## Operational limits
 

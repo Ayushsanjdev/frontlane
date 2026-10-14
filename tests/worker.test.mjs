@@ -8,12 +8,22 @@ import {spawnSync} from 'node:child_process';
 
 const worker=fileURLToPath(new URL('../apps/worker/scripts/publish-jobs.mjs',import.meta.url));
 const preload=fileURLToPath(new URL('./helpers/worker-fetch.mjs',import.meta.url));
+test('discovery worker sends cron credentials, validates receipts, and surfaces unavailable discovery',()=>{
+ const script=fileURLToPath(new URL('../apps/worker/scripts/discover-employers.mjs',import.meta.url));
+ const fixture=fileURLToPath(new URL('./helpers/discovery-fetch.mjs',import.meta.url));
+ for(const scenario of ['success','unavailable','malformed']){
+  const result=spawnSync(process.execPath,['--import',fixture,script],{env:{...process.env,APP_URL:'https://frontlane.example',CRON_SECRET:'c'.repeat(32),DISCOVERY_FIXTURE:scenario},encoding:'utf8',timeout:10000});
+  assert.equal(result.status,scenario==='success'?0:1,result.stderr);
+  if(scenario==='success')assert.equal(JSON.parse(result.stdout).registered,1);
+ }
+});
 test('production refresh worker publishes 50 jobs and emits a summary',()=>{
  const result=spawnSync(process.execPath,['--import',fileURLToPath(new URL('./helpers/refresh-fetch.mjs',import.meta.url)),fileURLToPath(new URL('../apps/worker/scripts/refresh-jobs.mjs',import.meta.url))],{
   env:{...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'false'},encoding:'utf8',timeout:10000,
  });
  assert.equal(result.status,0,result.stderr);
  assert.deepEqual(JSON.parse(result.stdout).summary,{target:50,published:50,shortfall:0,failedSources:0});
+ assert.ok(JSON.parse(result.stdout).sources.some(row=>row.source==='greenhouse:workernewco'));
 });
 
 test('production refresh worker exits unsuccessfully when all employers fail',()=>{

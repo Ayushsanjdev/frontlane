@@ -100,26 +100,27 @@ function normalize(row,provider,company,checked){
   });
 }
 
-async function fetchJson(endpoint,deadline){
+async function fetchJson(endpoint,deadline,fetchImpl=fetch,retries=true){
     let response;
-    for(let attempt=0;attempt<2;attempt++){
+    for(let attempt=0;attempt<(retries?2:1);attempt++){
       const timeout=AbortSignal.timeout(12000);
-      try{response=await fetch(endpoint,{signal:deadline?AbortSignal.any([deadline,timeout]):timeout})}
-      catch(error){if(attempt===1)throw error;continue}
+      try{deadline?.throwIfAborted();response=await fetchImpl(endpoint,{redirect:'error',signal:deadline?AbortSignal.any([deadline,timeout]):timeout})}
+      catch(error){if(!retries||attempt===1||deadline?.aborted)throw error;continue}
       if(response.ok||response.status!==429&&response.status<500)break;
     }
     if(!response?.ok)throw Error('Employer feed HTTP '+response?.status);
     return response.json();
 }
 
-async function fetchFeed([provider,slug,company],checked){
+export async function fetchEmployerFeed([provider,slug,company],checked,{signal,fetchImpl=fetch,retries=true}={}){
   const source=provider+':'+slug.toLowerCase();
   try{
     let raw;
-    if(provider==='smartrecruiters')raw=await smartRecruitersJobs(slug,fetchJson,eligible,DAILY_JOB_TARGET);
+    const getJson=(url,deadline)=>fetchJson(url,signal&&deadline?AbortSignal.any([signal,deadline]):signal||deadline,fetchImpl,retries);
+    if(provider==='smartrecruiters')raw=await smartRecruitersJobs(slug,getJson,eligible,DAILY_JOB_TARGET,{signal});
     else{
       const endpoint=provider==='greenhouse'?`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`:`https://api.lever.co/v0/postings/${slug}?mode=json`;
-      const data=await fetchJson(endpoint);
+      const data=await getJson(endpoint);
       raw=provider==='greenhouse'?data.jobs:data;
     }
     if(!Array.isArray(raw))throw Error('Invalid feed');
@@ -160,13 +161,19 @@ function selectJobs(feeds){
   return new Map(queues.map(item=>[item.source,item.selected]));
 }
 
-export async function refreshSources(publish,{sources=SOURCES}={}){
+/**
+ * @param {(batch:any)=>Promise<any>} publish
+ * @param {{sources?:string[][],signal?:AbortSignal,fetchImpl?:typeof fetch,rotation?:number}} [options]
+ */
+export async function refreshSources(publish,{sources=SOURCES,signal,fetchImpl=fetch,rotation=0}={}){
   const checked=new Date().toISOString();
   const runId='ats-'+randomUUID();
   const feeds=[];
+  const offset=sources.length?((rotation%sources.length)+sources.length)%sources.length:0;
+  sources=[...sources.slice(offset),...sources.slice(0,offset)];
   // Bound remote requests so the production cron can finish within its time budget.
   for(let i=0;i<sources.length;i+=4){
-    feeds.push(...await Promise.all(sources.slice(i,i+4).map(source=>fetchFeed(source,checked))));
+    feeds.push(...await Promise.all(sources.slice(i,i+4).map(source=>fetchEmployerFeed(source,checked,{signal,fetchImpl}))));
   }
   const selected=selectJobs(feeds);
   const outcomes=[];

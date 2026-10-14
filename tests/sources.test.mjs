@@ -6,6 +6,16 @@ import {Batch} from '@frontlanejobs/core/ingestion';
 const sources=[['greenhouse','alpha','Alpha'],['lever','beta','Beta'],['lever','gamma','Gamma']];
 const greenhouse=(id,patch={})=>({id,title:'Frontend Engineer',location:{name:'Bengaluru, India'},content:'Build React and TypeScript interfaces.',absolute_url:`https://careers.alpha.example/jobs/${id}`,metadata:[],...patch});
 const lever=(id,patch={})=>({id:String(id),text:'React Developer',categories:{location:'India',commitment:'Full-time'},descriptionPlain:'Build web interfaces with React.',lists:[],hostedUrl:`https://jobs.lever.co/beta/${id}`,workplaceType:'remote',...patch});
+test('rotation allows employers beyond the first fifty to participate',async t=>{
+  const sources=Array.from({length:60},(_,i)=>['greenhouse','company'+i,'Company '+i]);
+  t.mock.method(globalThis,'fetch',async input=>{
+    const slug=new URL(input).pathname.split('/').at(-2);
+    return Response.json({jobs:[greenhouse(1,{absolute_url:`https://job-boards.greenhouse.io/${slug}/jobs/1`})]});
+  });
+  const selected=[];
+  await adapters.refreshSources(async batch=>{selected.push(...batch.jobs);return {}},{sources,rotation:50});
+  assert.equal(selected.length,50);assert.ok(selected.some(job=>job.company==='Company 59'));
+});
 function feeds(t,data){
   t.mock.method(globalThis,'fetch',async url=>{
     const slug=new URL(url).pathname.split('/').at(-1)==='jobs'?new URL(url).pathname.split('/').at(-2):new URL(url).pathname.split('/').at(-1);

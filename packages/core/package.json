@@ -13,7 +13,10 @@
     "./refresh": "./src/refresh.mjs",
     "./ingestion": "./src/ingestion.mjs",
     "./sources": "./src/sources.mjs",
-    "./viewers": "./src/viewers.mjs"
+    "./viewers": "./src/viewers.mjs",
+    "./employers": "./src/employers.mjs",
+    "./discovery": "./src/discovery.mjs",
+    "./public-jobs": "./src/public-jobs.mjs"
   },
   "dependencies": {
     "@frontlanejobs/database": "workspace:*",

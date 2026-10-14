@@ -1,7 +1,12 @@
+import {SOURCES} from '@frontlanejobs/core/sources';
 globalThis.fetch=async(url,options)=>{
   const target=new URL(url);
   if(target.hostname==='frontlane.example'){
     if(options.headers.Authorization!=='Bearer '+'t'.repeat(32))throw Error('Missing ingestion token');
+    if(target.pathname==='/api/ingest/sources'){
+      if(options.method==='POST')return {ok:true,json:async()=>({accepted:JSON.parse(options.body).checkedSources.length})};
+      return {ok:true,json:async()=>({sources:[...SOURCES,['greenhouse','workernewco','Worker New Co']],deferred:0,rotation:0})};
+    }
     if(target.pathname==='/api/ingest/status')return {ok:JSON.parse(options.body).length<=20,status:400};
     const batch=JSON.parse(options.body);
     if(!batch.completeSnapshot)throw Error('Expected selection snapshot');

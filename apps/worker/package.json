@@ -8,6 +8,7 @@
   },
   "scripts": {
     "refresh": "node --env-file-if-exists=../../.env.local scripts/refresh-jobs.mjs",
+    "discover": "node --env-file-if-exists=../../.env.local scripts/discover-employers.mjs",
     "publish:jobs": "node --env-file-if-exists=../../.env.local scripts/publish-jobs.mjs"
   },
   "dependencies": {
