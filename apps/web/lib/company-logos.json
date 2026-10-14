@@ -1,0 +1,22 @@
+{
+  "GitLab": {
+    "path": "/companies/gitlab.ico",
+    "source": "https://about.gitlab.com/images/ico/favicon.ico",
+    "website": "https://about.gitlab.com/"
+  },
+  "Canonical": {
+    "path": "/companies/canonical.png",
+    "source": "https://assets.ubuntu.com/v1/f38b9c7e-COF%20apple-touch-icon.png",
+    "website": "https://canonical.com/"
+  },
+  "MongoDB": {
+    "path": "/companies/mongodb.ico",
+    "source": "https://www.mongodb.com/assets/images/global/favicon.ico",
+    "website": "https://www.mongodb.com/"
+  },
+  "CloudSEK": {
+    "path": "/companies/cloudsek.png",
+    "source": "https://cdn.prod.website-files.com/634fc5026f66af518e897c77/641377c816c6fc1eb7e44654_favicon-32x32.png",
+    "website": "https://www.cloudsek.com/"
+  }
+}

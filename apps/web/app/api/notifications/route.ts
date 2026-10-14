@@ -1,0 +1,7 @@
+import {database} from '@frontlanejobs/database/client';
+import {evaluateNotifications} from '@frontlanejobs/core/job-alerts';
+import {identity,failure,boundedJson} from '@/lib/auth-api';
+import {z} from 'zod';
+export async function GET(request:Request){try{const userId=await identity(request),db=database(),[rows,count]=await Promise.all([db.query('SELECT n.id,n.job,n.created_at,n.read_at,s.name,s.criteria FROM job_notifications n JOIN saved_searches s ON s.id=n.search_id WHERE n.user_id=$1 ORDER BY n.created_at DESC LIMIT 100',[userId]),db.query('SELECT count(*)::int AS unread FROM job_notifications WHERE user_id=$1 AND read_at IS NULL',[userId])]);return Response.json({items:rows.rows,unread:count.rows[0].unread},{headers:{'Cache-Control':'no-store'}})}catch(error){return failure(error)}}
+export async function POST(request:Request){try{const userId=await identity(request,true);return Response.json(await evaluateNotifications(database(),userId),{headers:{'Cache-Control':'no-store'}})}catch(error){return failure(error)}}
+export async function PATCH(request:Request){try{const userId=await identity(request,true),{id}=z.object({id:z.string().uuid()}).strict().parse(await boundedJson(request,1000));await database().query('UPDATE job_notifications SET read_at=now() WHERE id=$1 AND user_id=$2',[id,userId]);return Response.json({ok:true},{headers:{'Cache-Control':'no-store'}})}catch(error){return failure(error)}}

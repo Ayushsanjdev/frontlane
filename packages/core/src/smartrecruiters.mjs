@@ -15,10 +15,10 @@ export async function smartRecruitersJobs(slug,fetchJson,eligible,target,{signal
       if(row.location.country!=='in'||!eligible(row.name,row.location.fullLocation||'India','')||seen.has(row.id))continue;
       seen.add(row.id);
       candidates.push(row);
-      if(candidates.length===target)break;
+
     }
     offset+=data.content.length;
-    if(candidates.length===target||offset>=data.totalFound)break;
+    if(offset>=data.totalFound)break;
     if(page===9)throw Error('Employer pagination exceeded refresh budget');
   }
   const jobs=[];

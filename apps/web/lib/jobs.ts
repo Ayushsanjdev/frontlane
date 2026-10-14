@@ -9,6 +9,6 @@ export async function jobCollection(params=new URLSearchParams()):Promise<JobCol
 }
 
 export async function jobDetail(id:string):Promise<{job:Job|null;fallback:boolean}>{
-  try{return {job:await getJob(database(),id),fallback:false}}
+  try{return {job:await getJob(database(),id,{includeUnavailable:true}),fallback:false}}
   catch{return {job:seedJobs.find(job=>job.id===id)||null,fallback:true}}
 }

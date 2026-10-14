@@ -15,7 +15,7 @@ const sources=await refreshSources(async batch=>{
   });
   if(!response.ok)throw Error('Publish HTTP '+response.status);
   return response.json();
-},{sources:selection.sources,rotation:selection.rotation});
+},{sources:selection.sources,rotation:selection.rotation,fullSnapshots:true});
 try{
   const response=await fetch(new URL('/api/ingest/sources',base),{
     method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},

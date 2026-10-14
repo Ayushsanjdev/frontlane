@@ -69,6 +69,13 @@ test('duplicate career URLs are canonicalized before selecting a daily batch',as
   await adapters.refreshSources(async batch=>{batches.push(batch);return {accepted:batch.jobs.length}},{sources:sources.slice(0,2)});
   assert.deepEqual(batches.flatMap(batch=>batch.jobs).map(job=>job.url),['https://careers.alpha.example/jobs/1']);
 });
+test('complete available snapshots deduplicate canonical URLs before persistence',async t=>{
+  feeds(t,{alpha:{jobs:[greenhouse(1),greenhouse(2,{absolute_url:'https://careers.alpha.example/jobs/1?utm_source=duplicate'})]}});
+  const {PGlite}=await import('@electric-sql/pglite'),{readFile}=await import('node:fs/promises'),{ingest}=await import('@frontlanejobs/core/ingestion');
+  const pg=new PGlite();await pg.exec(await readFile(new URL(import.meta.resolve('@frontlanejobs/database/schema')),'utf8'));
+  const db={connect:async()=>({query:(sql,args)=>pg.query(sql,args),release(){}})};
+  try{const result=await adapters.refreshSources(batch=>ingest(batch,db),{sources:sources.slice(0,1),fullSnapshots:true});assert.equal(result[0].status,'ok');assert.equal((await pg.query('SELECT count(*)::int AS n FROM jobs')).rows[0].n,1);}finally{await pg.close()}
+});
 
 test('invalid or unavailable source never publishes a replacement snapshot',async t=>{
   feeds(t,{alpha:{jobs:[greenhouse(1,{absolute_url:'javascript:alert(1)'})]},beta:{unexpected:'response'}});

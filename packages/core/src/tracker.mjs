@@ -1,3 +1,5 @@
+import {WorkspaceInput} from './workspace-model.mjs';
+import {JobEnrichmentInput} from './job-enrichment.mjs';
 import {z} from 'zod';
 
 const text=n=>z.string().max(n);
@@ -20,11 +22,12 @@ const Job=z.object({
   summary:text(1800),caveat:text(600),url,source:text(101),
   discovered:day,checked:z.union([z.string().datetime({offset:true}),z.literal('')]),
   posted:z.string().datetime({offset:true}).nullable(),
-  eligibility:text(400),degree:text(300),
+  eligibility:text(400),degree:text(300),enrichment:JobEnrichmentInput.optional(),availability:z.enum(['available','closed','unknown']).optional(),companyId:text(101).optional(),
 }).strict();
 const Application=z.object({
   id:z.union([z.string().uuid(),z.literal('')]).optional(),
   jobId:z.string().trim().min(1).max(200).optional(),job:Job,
+  workspace:WorkspaceInput.optional(),revision:z.number().int().nonnegative().optional(),
   stage:z.enum(['Saved','Preparing','Applied','Interview','Offer','Rejected','Withdrawn']),
   notes:text(6000).default(''),answers:text(6000).default(''),
   evidence:text(1000).default(''),appliedAt:optionalDay,followUp:optionalDay,

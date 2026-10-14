@@ -2,9 +2,10 @@ import {getUser} from '@/lib/session';
 import {jobCollection} from '@/lib/jobs';
 import Board from './board';
 
-export default async function Page({searchParams}:{searchParams:Promise<{type?:string|string[]}>}){
+export default async function Page({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}){
   const params=await searchParams;
   const type=typeof params.type==='string'?params.type:'All';
-  const [user,collection]=await Promise.all([getUser(),jobCollection(new URLSearchParams({type,limit:'12'}))]);
-  return <Board signedIn={!!user} initialCollection={collection} initialType={type}/>;
+  const query=new URLSearchParams();for(const [key,value] of Object.entries(params))for(const entry of Array.isArray(value)?value:value?[value]:[])query.append(key,entry);query.delete('limit');const initialParameters=query.toString();query.set('limit','12');
+  const [user,collection]=await Promise.all([getUser(),jobCollection(query)]);
+  return <Board signedIn={!!user} initialCollection={collection} initialType={type} initialParameters={initialParameters}/>;
 }

@@ -10,3 +10,12 @@ CREATE INDEX IF NOT EXISTS ingestion_runs_completed ON ingestion_runs(completed_
 CREATE TABLE IF NOT EXISTS source_checks(source text PRIMARY KEY, checked_at timestamptz NOT NULL, status text NOT NULL,matched integer NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS viewers (id uuid PRIMARY KEY, last_seen_at timestamptz NOT NULL DEFAULT now());
 CREATE INDEX IF NOT EXISTS viewers_last_seen ON viewers(last_seen_at);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_available boolean;
+CREATE TABLE IF NOT EXISTS job_first_publications (
+  sequence bigint GENERATED ALWAYS AS IDENTITY UNIQUE,
+  canonical_url text PRIMARY KEY,
+  job_id text NOT NULL,
+  published_at timestamptz NOT NULL DEFAULT now(),
+  baseline boolean NOT NULL DEFAULT false
+);
+CREATE INDEX IF NOT EXISTS job_publication_sequence ON job_first_publications(sequence);

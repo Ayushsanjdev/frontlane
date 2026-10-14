@@ -17,7 +17,16 @@
     "./employers": "./src/employers.mjs",
     "./discovery": "./src/discovery.mjs",
     "./public-jobs": "./src/public-jobs.mjs",
-    "./mobile-sessions": "./src/mobile-sessions.mjs"
+    "./mobile-sessions": "./src/mobile-sessions.mjs",
+    "./job-enrichment": "./src/job-enrichment.mjs",
+    "./tracker-store": "./src/tracker-store.mjs",
+    "./workspace-model": "./src/workspace-model.mjs",
+    "./recommendations": "./src/recommendations.mjs",
+    "./job-alerts": "./src/job-alerts.mjs",
+    "./email-digests": "./src/email-digests.mjs",
+    "./email-template": "./src/email-template.mjs",
+    "./email-transport": "./src/email-transport.mjs",
+    "./discovery-store": "./src/discovery-store.mjs"
   },
   "dependencies": {
     "@frontlanejobs/database": "workspace:*",

@@ -32,6 +32,7 @@ export async function publishPublicJob(db,userId,input,{now=new Date()}={}){
   if(!eligible(fields.title,fields.location,fields.summary+' '+fields.eligibility))throw new PublicJobError('Post a frontend role located in India or explicitly open worldwide.',400);
   const hash=createHash('sha256').update(JSON.stringify(fields)).digest('hex');
   return discoveryTransaction(db,async client=>{
+    await client.query("SELECT pg_advisory_xact_lock(hashtext('frontlane-publication'))");
     await client.query("SELECT pg_advisory_xact_lock(hashtext($1))",['public-jobs:user:'+userId]);
     const previous=(await client.query('SELECT owner_id,job_id,body_hash FROM job_publications WHERE id=$1',[submissionId])).rows[0];
     if(previous){
@@ -49,6 +50,7 @@ export async function publishPublicJob(db,userId,input,{now=new Date()}={}){
     const job=JobInput.parse({...fields,checked:now.toISOString(),posted:null,caveat:'Community-submitted listing. Verify availability, employer identity and requirements before applying.'});
     const id=jobId('community',job),payload={...job,id,source:'community',discovered:now.toISOString().slice(0,10)};
     await client.query('INSERT INTO jobs(id,source,canonical_url,payload,discovered_at) VALUES($1,$2,$3,$4,$5)',[id,'community',job.url,payload,now]);
+    await client.query('INSERT INTO job_first_publications(canonical_url,job_id,published_at) VALUES($1,$2,$3) ON CONFLICT DO NOTHING',[job.url,id,now]);
     await client.query('INSERT INTO job_publications(id,owner_id,job_id,body_hash,created_at) VALUES($1,$2,$3,$4,$5)',[submissionId,userId,id,hash,now]);
     return {job:payload,replayed:false};
   }).catch(error=>{

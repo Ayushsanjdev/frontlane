@@ -13,6 +13,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@frontlanejobs/contracts": "workspace:*",
+    "@frontlanejobs/core": "workspace:*",
+    "@frontlanejobs/database": "workspace:*",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "^1.31.0",
@@ -22,11 +25,9 @@
     "radix-ui": "^1.6.7",
     "react": "19.2.6",
     "react-dom": "19.2.6",
+    "svix": "^2.8.0",
     "tailwind-merge": "3.6.0",
-    "zod": "^3.25.76",
-    "@frontlanejobs/core": "workspace:*",
-    "@frontlanejobs/database": "workspace:*",
-    "@frontlanejobs/contracts": "workspace:*"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "4.2.1",

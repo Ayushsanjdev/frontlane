@@ -1,3 +1,4 @@
+import {enrichJob,technologyTokens} from './job-enrichment.mjs';
 import {randomUUID} from 'node:crypto';
 import {decodeHTMLStrict} from 'entities';
 import {canonicalUrl,JobInput} from './ingestion.mjs';
@@ -87,17 +88,21 @@ function normalize(row,provider,company,checked){
   if(!eligible(title,location,description))return null;
   if(row.id===undefined||row.id===null)throw Error('Missing job ID');
   const url=canonicalUrl(provider==='greenhouse'?row.absolute_url:row.hostedUrl);
-  return JobInput.parse({
+  const normalized=JobInput.parse({
     requisitionId:String(row.id),title:title.slice(0,160),company,location:location.slice(0,200),
     mode:row.workplaceType==='remote'||/remote|home based|worldwide|anywhere in the world/i.test(location)?'Remote':row.workplaceType==='hybrid'||/hybrid/i.test(location)?'Hybrid':'Onsite',
     type:employmentType(row),salary:'Not disclosed',
-    tags:['React Native','Next.js','React','TypeScript','Tailwind','Redux','AWS','JavaScript','Angular','Vue','Svelte'].filter(tag=>(title+' '+description).toLowerCase().includes(tag.toLowerCase())),
+    tags:technologyTokens(title+' '+description),
+    enrichment:enrichJob({title,description,arrangement:row.workplaceType==='remote'?'Remote':row.workplaceType==='hybrid'?'Hybrid':/on[- ]?site/i.test(row.workplaceType||'')?'Onsite':/remote|home based|worldwide|anywhere in the world/i.test(location)?'Remote':/hybrid/i.test(location)?'Hybrid':'Unknown'}),
     experience:'See employer requirements',summary:description.slice(0,1500),
     caveat:'Review the full employer listing, eligibility and working hours before applying.',
     url,checked,posted:provider==='smartrecruiters'?row.posted:provider==='lever'&&row.createdAt?new Date(row.createdAt).toISOString():null,
     eligibility:/worldwide|anywhere/i.test(location)?'Worldwide remote':'India location listed',
     degree:/equivalent (practical|professional|work) experience/i.test(description)?'Equivalent experience accepted':'Review employer requirements',
   });
+  const pay=normalized.enrichment?.compensation;if(pay)normalized.salary=pay.currency+' '+pay.min.toLocaleString('en-IN')+(pay.max!==pay.min?'–'+pay.max.toLocaleString('en-IN'):'')+' / '+pay.period;
+  if(normalized.enrichment?.yearsMin!==undefined)normalized.experience=normalized.enrichment.yearsMin+(normalized.enrichment.yearsMax!==undefined?'–'+normalized.enrichment.yearsMax:'+')+' years';
+  return normalized;
 }
 
 async function fetchJson(endpoint,deadline,fetchImpl=fetch,retries=true){
@@ -126,7 +131,14 @@ export async function fetchEmployerFeed([provider,slug,company],checked,{signal,
     if(!Array.isArray(raw))throw Error('Invalid feed');
     // Validate before replacing a snapshot: malformed feeds must preserve existing jobs.
     const jobs=raw.map(row=>normalize(row,provider,company,checked)).filter(Boolean);
-    return {source,jobs};
+    const unique=new Map(),identities=new Map();
+    for(const job of jobs){
+      const previous=identities.get(job.requisitionId);
+      if(previous&&previous!==job.url)throw Error('Conflicting employer job identity');
+      identities.set(job.requisitionId,job.url);
+      if(!unique.has(job.url))unique.set(job.url,job);
+    }
+    return {source,jobs:[...unique.values()]};
   }catch(error){return {source,status:'failed',error:String(error.message).slice(0,160)}}
 }
 
@@ -163,9 +175,9 @@ function selectJobs(feeds){
 
 /**
  * @param {(batch:any)=>Promise<any>} publish
- * @param {{sources?:string[][],signal?:AbortSignal,fetchImpl?:typeof fetch,rotation?:number}} [options]
+ * @param {{sources?:string[][],signal?:AbortSignal,fetchImpl?:typeof fetch,rotation?:number,fullSnapshots?:boolean}} [options]
  */
-export async function refreshSources(publish,{sources=SOURCES,signal,fetchImpl=fetch,rotation=0}={}){
+export async function refreshSources(publish,{sources=SOURCES,signal,fetchImpl=fetch,rotation=0,fullSnapshots=false}={}){
   const checked=new Date().toISOString();
   const runId='ats-'+randomUUID();
   const feeds=[];
@@ -182,7 +194,7 @@ export async function refreshSources(publish,{sources=SOURCES,signal,fetchImpl=f
     const jobs=selected.get(feed.source);
     try{
       // The snapshot is this employer's share of the daily selection, not its entire feed.
-      const receipt=await publish({source:feed.source,runId,jobs,completeSnapshot:true});
+      const receipt=await publish({source:feed.source,runId,jobs,completeSnapshot:true,...(fullSnapshots?{availableJobs:feed.jobs}:{})});
       outcomes.push({source:feed.source,status:'ok',matched:jobs.length,available:feed.jobs.length,receipt});
     }catch(error){outcomes.push({source:feed.source,status:'failed',error:String(error.message).slice(0,160)})}
   }

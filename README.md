@@ -109,9 +109,19 @@ Automatic employer discovery uses Brave Search with application caps of 30 searc
 
 Signed-in members can use **Add a job** beside the jobs-page count and sort control to publish a public community listing. Apply migrations before enabling this version (`003-public-job-posts.sql` stores private publisher attribution and retry receipts). Publications require an HTTPS application link and an eligible frontend role, are limited to ten per account per UTC day, and never appear as employer-verified checks. Retrying an unchanged submission is safe; duplicate application links are rejected. Active employer-feed listings take display priority when the same link is later ingested, while each source retains its own records. Private tracker entries remain separate.
 
+## Web career workspace
+
+The web app adds URL-based multi-stack search, richer role details, employer pages with verified icon assets, public role comparison, structured matching preferences, and a private application workspace. `/tracker` provides Today actions, table/board views, stage confirmation, interviews/calendar export, contacts, document-version links, preparation, offers, and activity-based progress. `/inbox` manages saved searches and in-app job alerts. Native mobile screens are unchanged; additive shared fields retain old-client compatibility.
+
+Apply migrations `005` through `009` before enabling these features. Availability is separate from the daily selection: unselected feed roles remain available, and successful complete source snapshots determine closure. The private tracker keeps its saved snapshot and displays current availability separately. Full employer snapshots are bounded at 2,000 eligible rows; oversized/malformed sources fail safely without partial reconciliation. Remote ingestion bodies are limited to 5 MB.
+
+Daily email digests are disabled by default and use the verified account email. Members choose matching jobs (default) or all new jobs. Only first-publication events qualify; empty days do not send mail. Read [email setup, scheduling, retries and unsubscribe](docs/EMAIL-DIGESTS.md) before activation. API keys, verified sender/DNS, signed webhook registration, and the digest retry schedule must be configured in the deployment; local tests do not verify live delivery.
+
+Anonymous product metrics store only per-day event counts, without search text, notes, document links, contacts, email addresses, or application content. A daily salted hash of the existing viewer cookie bounds contributions to 100 events/day and expires after two days; aggregate counts expire after 90 days when events are processed. Set `DISABLE_PRODUCT_METRICS=true` to disable collection. Tracker progress remains private.
+
 ## Operational limits
 
-Tracker retrieval currently caps at 1,000 rows. Before a large launch, address cursor pagination, account deletion, abuse rate limiting, backup and restore drills, and load testing. Compilation and local integration tests do not verify live OAuth, deployment behavior, or production capacity.
+Legacy tracker retrieval caps at 1,000 rows; the web workspace uses cursor pagination and exports the complete collection. Before a large launch, address cursor pagination, account deletion, abuse rate limiting, backup and restore drills, and load testing. Compilation and local integration tests do not verify live OAuth, deployment behavior, or production capacity.
 
 ## Third-party licenses
 
