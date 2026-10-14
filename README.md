@@ -101,6 +101,8 @@ For researched jobs, publish a JSON batch with `pnpm jobs:publish batch.json` or
 
 Automatic employer discovery uses Brave Search with application caps of 30 search attempts per UTC day and 1,000 per UTC calendar month. Configure the server-only `BRAVE_SEARCH_API_KEY`, migrate the database, and enable a separate discovery schedule. Verified new employers join the daily refresh in rotating batches. See [employer discovery setup and operations](docs/EMPLOYER-DISCOVERY.md).
 
+Signed-in members can use **Add a job** beside the jobs-page count and sort control to publish a public community listing. Apply migrations before enabling this version (`003-public-job-posts.sql` stores private publisher attribution and retry receipts). Publications require an HTTPS application link and an eligible frontend role, are limited to ten per account per UTC day, and never appear as employer-verified checks. Retrying an unchanged submission is safe; duplicate application links are rejected. Active employer-feed listings take display priority when the same link is later ingested, while each source retains its own records. Private tracker entries remain separate.
+
 ## Operational limits
 
 Tracker retrieval currently caps at 1,000 rows. Before a large launch, address cursor pagination, account deletion, abuse rate limiting, backup and restore drills, and load testing. Compilation and local integration tests do not verify live OAuth, deployment behavior, or production capacity.

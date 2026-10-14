@@ -5,7 +5,7 @@ function options(params){
 
 export async function listJobs(db,params=new URLSearchParams()){
   const {page,limit,q,sort}=options(params);
-  const conditions=['active=true'],args=[];
+  const conditions=['active=true',"NOT (source='community' AND EXISTS(SELECT 1 FROM jobs employer WHERE employer.active=true AND employer.source<>'community' AND employer.canonical_url=jobs.canonical_url))"],args=[];
   if(q){
     args.push('%'+q.replace(/[\\%_]/g,'\\$&')+'%');
     conditions.push(`concat_ws(' ',payload->>'title',payload->>'company',payload->>'location',COALESCE(payload->'tags','[]'::jsonb)::text) ILIKE $1`);

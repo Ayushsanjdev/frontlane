@@ -3,7 +3,7 @@ import {PGlite} from '@electric-sql/pglite';
 
 export async function discoveryDatabase(){
   const pg=new PGlite();
-  for(const name of ['001-init.sql','002-employer-discovery.sql']){
+  for(const name of ['001-init.sql','002-employer-discovery.sql','003-public-job-posts.sql']){
     await pg.exec(await readFile(new URL('../../packages/database/schema/'+name,import.meta.url),'utf8'));
   }
   let tail=Promise.resolve();
