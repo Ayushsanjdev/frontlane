@@ -82,6 +82,8 @@ test('cron processes sources on one connection and releases it after commit',asy
   assert.equal(body.sources.length,SOURCES.length);
   assert.ok(body.sources.every(source=>source.status==='ok'));
   assert.deepEqual(body.summary,{target:50,published:0,shortfall:50,failedSources:0});
+  assert.deepEqual(body.emailDigests,{available:false});
+  assert.deepEqual(body.pushDigests,{available:false});
   assert.deepEqual(calls.slice(-2),['COMMIT','release']);
  }finally{globalThis.fetch=original}
 });

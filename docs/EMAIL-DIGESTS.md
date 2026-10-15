@@ -10,7 +10,7 @@ The Gmail transport uses authenticated TLS on smtp.gmail.com:465. The app reserv
 
 SMTP has no provider idempotency guarantee. Explicit temporary SMTP rejections can retry; timeouts, unclear acceptance, and expired Gmail send leases become ambiguous and require operator reconciliation. A stable Message-ID assists reconciliation but does not guarantee deduplication. Already attempted deliveries cannot switch providers. For never-attempted deliveries only, the configured sender binds at first claim; content, recipient and unsubscribe token remain unchanged. Once attempted, the body stays frozen. Only an explicit invalid-recipient 5.1.1 response suppresses a subscriber; generic policy rejection does not. Gmail SMTP acceptance is recorded as accepted, with no delivery webhook confirmation or asynchronous bounce/complaint suppression. Monitor the dedicated sender mailbox for later bounces.
 
-The existing daily job refresh and ten-minute digest retry schedules serve either provider. Verify with a controlled opted-in account after adding the secret; do not claim inbox delivery from configuration presence alone. Google may block a new server sign-in, so authentication must be verified from the deployed runtime.
+The existing three daily employer refreshes and ten-minute digest retry schedule serve either provider. New daily campaigns begin after 08:00 IST; subsequent refreshes recover missed work without creating another daily campaign. Verify with a controlled opted-in account after adding the secret; do not claim inbox delivery from configuration presence alone. Google may block a new server sign-in, so authentication must be verified from the deployed runtime.
 
 References: [Nodemailer Gmail guide](https://nodemailer.com/guides/using-gmail), [Google app passwords](https://support.google.com/mail/answer/185833), [Gmail limits](https://support.google.com/mail/answer/22839).
 
@@ -42,3 +42,5 @@ Visible email links open `/unsubscribe`, a confirmation page that does not mutat
 SQL migrations are idempotent. Email tables contain private recipient/delivery data and must be covered by existing database backups and access controls. The code does not send recruiter messages or submit applications.
 
 Provider references: [Resend API](https://resend.com/docs/api-reference/emails/send-email), [idempotency lifetime](https://resend.com/changelog/idempotency-keys), [webhook verification](https://resend.com/docs/webhooks/verify-webhooks-requests).
+
+Daily consent onboarding, browser push and the shared publication cutoff are documented in [notification operations](NOTIFICATIONS.md). Apply migration 012 and configure the same VAPID pair locally and in the deployment environment.

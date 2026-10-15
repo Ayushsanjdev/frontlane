@@ -1,4 +1,4 @@
-import {processEmailDigests} from '@/lib/email-digests';
+import {processDailyNotifications} from '@/lib/daily-notifications';
 import {authorized,ingest} from '@frontlanejobs/core/ingestion';
 import {refreshSources,refreshSummary} from '@frontlanejobs/core/sources';
 import {withRefreshLock} from '@frontlanejobs/core/refresh';
@@ -27,9 +27,9 @@ export async function GET(request:Request){
     });
     if(result.skipped)return Response.json(result,{status:202,headers:{'Cache-Control':'no-store'}});
     const summary=refreshSummary(result.sources);
-    let emailDigests;
-    if(summary.failedSources<result.sources.length&&Date.now()-started<285000){try{emailDigests=await processEmailDigests({createCampaign:true,budgetMs:Math.min(20000,290000-(Date.now()-started))})}catch{emailDigests={available:false,error:'Email processing deferred'}}}
-    return Response.json({...result,summary,deferredEmployers,emailDigests},{status:summary.failedSources===result.sources.length?503:200,headers:{'Cache-Control':'no-store'}});
+    let notifications;
+    if(summary.failedSources<result.sources.length&&Date.now()-started<285000){try{notifications=await processDailyNotifications({createCampaign:true,budgetMs:Math.min(20000,290000-(Date.now()-started))})}catch{notifications={email:{available:false,error:'Email processing deferred'},push:{available:false,error:'Push processing deferred'}}}}
+    return Response.json({...result,summary,deferredEmployers,emailDigests:notifications?.email,pushDigests:notifications?.push},{status:summary.failedSources===result.sources.length?503:200,headers:{'Cache-Control':'no-store'}});
   }catch{
     return Response.json({error:'Job refresh is unavailable. Please try again.'},{status:503,headers:{'Cache-Control':'no-store'}});
   }

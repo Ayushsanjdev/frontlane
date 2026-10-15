@@ -130,3 +130,5 @@ Preserve the included shadcn license in `apps/web/vendor/` and licenses of other
 Remote worldwide and India-eligible frontend jobs have a dedicated `/jobs/remote` board. See [remote sources, refresh command and scheduler setup](docs/REMOTE-JOBS.md).
 
 Explore collections are available at `/explore`: FAANG, Big Tech, product companies, growth startups, services, recently funded companies and Fresher Special. See [Explore setup and maintenance](docs/EXPLORE.md) for company/funding updates and sourcing. Explore uses the existing `.env.local` setup and requires no additional environment variables in local development or production.
+
+Daily notification onboarding and browser push setup: [notifications operations](docs/NOTIFICATIONS.md). Apply migration `012`; preserve local and deployment VAPID keys and explicit per-channel consent.

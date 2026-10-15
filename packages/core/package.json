@@ -29,7 +29,9 @@
     "./discovery-store": "./src/discovery-store.mjs",
     "./remote-refresh": "./src/remote-refresh.mjs",
     "./remote-eligibility": "./src/remote-eligibility.mjs",
-    "./explore": "./src/explore.mjs"
+    "./explore": "./src/explore.mjs",
+    "./push-notifications": "./src/push-notifications.mjs",
+    "./notification-jobs": "./src/notification-jobs.mjs"
   },
   "dependencies": {
     "@frontlanejobs/database": "workspace:*",
@@ -37,6 +39,7 @@
     "fast-xml-parser": "^5.11.2",
     "jose": "6.2.2",
     "nodemailer": "^10.1.1",
+    "web-push": "^3.6.7",
     "zod": "^3.25.76"
   }
 }

@@ -1,7 +1,8 @@
+import {dailyCutoff,notificationJobs} from './notification-jobs.mjs';
 import {randomUUID,randomBytes,createHash} from 'node:crypto';
 import {z} from 'zod';
 import {discoveryTransaction} from './discovery-store.mjs';
-import {hasMatchingPreferences,rankRecommendations} from './recommendations.mjs';
+import {hasMatchingPreferences} from './recommendations.mjs';
 import {renderDigest} from './email-template.mjs';
 import {WorkspaceError} from './tracker-store.mjs';
 const hash=value=>createHash('sha256').update(value).digest('hex');
@@ -19,6 +20,7 @@ export async function setDigestSubscription(db,input){
     const changed=!existing||existing.enabled!==value.enabled||existing.mode!==value.mode||existing.email!==value.verifiedEmail;
     const boundary=(await client.query('SELECT COALESCE(max(sequence),0) AS n FROM job_first_publications')).rows[0].n;
     const result=await client.query('INSERT INTO digest_subscriptions(user_id,email,enabled,mode,boundary) VALUES($1,$2,$3,$4,$5) ON CONFLICT(user_id) DO UPDATE SET email=excluded.email,enabled=excluded.enabled,mode=excluded.mode,generation=digest_subscriptions.generation+$6,boundary=CASE WHEN $6=1 THEN excluded.boundary ELSE digest_subscriptions.boundary END,suppressed=CASE WHEN digest_subscriptions.email<>excluded.email THEN false ELSE digest_subscriptions.suppressed END RETURNING user_id,email,enabled,mode',[value.userId,value.verifiedEmail,value.enabled,value.mode,boundary,changed?1:0]);
+    if(changed&&value.enabled)await client.query('UPDATE digest_subscriptions SET consented_at=now() WHERE user_id=$1',[value.userId]);
     if(changed)await client.query("UPDATE email_deliveries SET status='suppressed' WHERE user_id=$1 AND status IN ('pending','retry')",[value.userId]);
     return result.rows[0];
   });
@@ -26,22 +28,19 @@ export async function setDigestSubscription(db,input){
 export async function queueDailyDigests(db,{publicationDay:day=publicationDay(),from,appUrl,limit=100}={}){
   z.string().regex(/^\d{4}-\d{2}-\d{2}$/).parse(day);if(!from||!appUrl)throw new WorkspaceError('Email delivery is unavailable',503);
   return discoveryTransaction(db,async client=>{
-    const cutoff=(await client.query('SELECT COALESCE(max(sequence),0) AS n FROM job_first_publications')).rows[0].n;
+    const cutoff=await dailyCutoff(client,day);
     await client.query('INSERT INTO digest_campaigns(publication_day,cutoff) VALUES($1,$2) ON CONFLICT DO NOTHING',[day,cutoff]);
     const campaign=(await client.query('SELECT * FROM digest_campaigns WHERE publication_day=$1 FOR UPDATE',[day])).rows[0];
     if(campaign.complete)return {queued:0,complete:true};
     const subscriptions=(await client.query('SELECT * FROM digest_subscriptions WHERE enabled=true AND suppressed=false AND user_id>$1 ORDER BY user_id LIMIT $2 FOR UPDATE',[campaign.last_user,Math.min(limit,100)])).rows;
     let queued=0;
     for(const sub of subscriptions){
-      const rows=(await client.query("SELECT p.sequence,j.payload FROM job_first_publications p JOIN LATERAL (SELECT payload FROM jobs WHERE canonical_url=p.canonical_url AND active=true ORDER BY (source='community'),discovered_at DESC LIMIT 1) j ON true WHERE p.sequence>$1 AND p.sequence<=$2 AND p.baseline=false ORDER BY p.sequence",[sub.boundary,campaign.cutoff])).rows;
-      const feedback=(await client.query('SELECT kind,target FROM job_feedback WHERE user_id=$1',[sub.user_id])).rows;
-      let jobs=rows.map(row=>row.payload).filter(job=>!feedback.some(row=>row.kind==='job'&&row.target===job.id||row.kind==='company'&&row.target===job.company.toLowerCase()));
-      if(sub.mode==='matching'){const profile=(await client.query('SELECT payload FROM profiles WHERE user_id=$1',[sub.user_id])).rows[0]?.payload;jobs=hasMatchingPreferences(profile?.matchingPreferences)?rankRecommendations(jobs,profile.matchingPreferences,feedback).filter(job=>job.matchReasons.length>0):[]}
+      const jobs=await notificationJobs(client,{userId:sub.user_id,boundary:sub.boundary,cutoff:campaign.cutoff,mode:sub.mode});
       if(jobs.length){
         const id=randomUUID(),token=randomBytes(32).toString('base64url'),body=renderDigest({id,email:sub.email,jobs,token,publicationDay:day,mode:sub.mode},{appUrl,from});
         const result=await client.query('INSERT INTO email_deliveries(id,user_id,publication_day,generation,recipient,mode,jobs,body,unsubscribe_hash) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) ON CONFLICT(user_id,publication_day) DO NOTHING RETURNING id',[id,sub.user_id,day,sub.generation,sub.email,sub.mode,jobs,body,hash(token)]);queued+=result.rows.length;
       }
-      await client.query('UPDATE digest_subscriptions SET boundary=$2 WHERE user_id=$1',[sub.user_id,campaign.cutoff]);
+      await client.query('UPDATE digest_subscriptions SET boundary=GREATEST(boundary,$2) WHERE user_id=$1',[sub.user_id,campaign.cutoff]);
     }
     const complete=subscriptions.length<Math.min(limit,100);
     await client.query('UPDATE digest_campaigns SET last_user=$2,complete=$3 WHERE publication_day=$1',[day,subscriptions.at(-1)?.user_id||campaign.last_user,complete]);

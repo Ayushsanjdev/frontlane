@@ -1,0 +1,2 @@
+import type {MetadataRoute} from 'next';
+export default function manifest():MetadataRoute.Manifest{return {id:'/',name:'FrontlaneJobs',short_name:'FrontlaneJobs',description:'Frontend opportunities for your next move.',start_url:'/',scope:'/',display:'standalone',background_color:'#101421',theme_color:'#101421',icons:[{src:'/icons/push-192.png',sizes:'192x192',type:'image/png'},{src:'/icons/push-512.png',sizes:'512x512',type:'image/png'}]}}

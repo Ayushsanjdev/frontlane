@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS notification_consents(user_id text PRIMARY KEY,version integer NOT NULL DEFAULT 1,reviewed_at timestamptz NOT NULL DEFAULT now());
+ALTER TABLE digest_subscriptions ADD COLUMN IF NOT EXISTS consented_at timestamptz;
+CREATE TABLE IF NOT EXISTS daily_notification_campaigns(publication_day text PRIMARY KEY,cutoff bigint NOT NULL,created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE IF NOT EXISTS push_subscriptions(id uuid PRIMARY KEY,user_id text NOT NULL,endpoint text NOT NULL UNIQUE,subscription jsonb NOT NULL,mode text NOT NULL CHECK(mode IN ('matching','all')),enabled boolean NOT NULL DEFAULT true,generation integer NOT NULL DEFAULT 1,boundary bigint NOT NULL DEFAULT 0,consented_at timestamptz NOT NULL DEFAULT now(),updated_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX IF NOT EXISTS push_subscriptions_user ON push_subscriptions(user_id);
+CREATE TABLE IF NOT EXISTS push_campaigns(publication_day text PRIMARY KEY,cutoff bigint NOT NULL,last_device text NOT NULL DEFAULT '',complete boolean NOT NULL DEFAULT false);
+CREATE TABLE IF NOT EXISTS push_deliveries(id uuid PRIMARY KEY,subscription_id uuid NOT NULL REFERENCES push_subscriptions(id),publication_day text NOT NULL,generation integer NOT NULL,payload jsonb NOT NULL,jobs jsonb NOT NULL DEFAULT '[]'::jsonb,status text NOT NULL DEFAULT 'pending',attempts integer NOT NULL DEFAULT 0,next_attempt_at timestamptz NOT NULL DEFAULT now(),lease_until timestamptz,claim_id uuid,created_at timestamptz NOT NULL DEFAULT now(),UNIQUE(subscription_id,publication_day));
+CREATE INDEX IF NOT EXISTS push_queue_due ON push_deliveries(status,next_attempt_at);
