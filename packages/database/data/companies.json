@@ -1,0 +1,1039 @@
+[
+  {
+    "id": "meta",
+    "name": "Meta",
+    "aliases": [
+      "Meta",
+      "Facebook",
+      "Meta Platforms"
+    ],
+    "sources": [],
+    "groups": [
+      "faang",
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://www.metacareers.com/",
+    "description": "Social technology and consumer platforms.",
+    "evidenceUrl": "https://www.metacareers.com/",
+    "funding": []
+  },
+  {
+    "id": "amazon",
+    "name": "Amazon",
+    "aliases": [
+      "Amazon",
+      "Amazon Web Services",
+      "AWS"
+    ],
+    "sources": [
+      "amazon:amazon"
+    ],
+    "groups": [
+      "faang",
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://www.amazon.jobs/",
+    "description": "Commerce and cloud services.",
+    "evidenceUrl": "https://www.amazon.jobs/",
+    "funding": []
+  },
+  {
+    "id": "apple",
+    "name": "Apple",
+    "aliases": [
+      "Apple"
+    ],
+    "sources": [],
+    "groups": [
+      "faang",
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://www.apple.com/careers/",
+    "description": "Consumer devices, software and services.",
+    "evidenceUrl": "https://www.apple.com/careers/",
+    "funding": []
+  },
+  {
+    "id": "netflix",
+    "name": "Netflix",
+    "aliases": [
+      "Netflix"
+    ],
+    "sources": [],
+    "groups": [
+      "faang",
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://jobs.netflix.com/",
+    "description": "Entertainment and streaming products.",
+    "evidenceUrl": "https://jobs.netflix.com/",
+    "funding": []
+  },
+  {
+    "id": "google",
+    "name": "Google",
+    "aliases": [
+      "Google",
+      "Alphabet"
+    ],
+    "sources": [],
+    "groups": [
+      "faang",
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://www.google.com/about/careers/applications/",
+    "description": "Search, cloud and consumer software.",
+    "evidenceUrl": "https://www.google.com/about/careers/applications/",
+    "funding": []
+  },
+  {
+    "id": "microsoft",
+    "name": "Microsoft",
+    "aliases": [
+      "Microsoft"
+    ],
+    "sources": [],
+    "groups": [
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://careers.microsoft.com/",
+    "description": "Cloud, developer tools and productivity software.",
+    "evidenceUrl": "https://careers.microsoft.com/",
+    "funding": []
+  },
+  {
+    "id": "nvidia",
+    "name": "NVIDIA",
+    "aliases": [
+      "NVIDIA"
+    ],
+    "sources": [],
+    "groups": [
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://www.nvidia.com/en-us/about-nvidia/careers/",
+    "description": "Computing platforms and developer tools.",
+    "evidenceUrl": "https://www.nvidia.com/en-us/about-nvidia/careers/",
+    "funding": []
+  },
+  {
+    "id": "adobe",
+    "name": "Adobe",
+    "aliases": [
+      "Adobe"
+    ],
+    "sources": [],
+    "groups": [
+      "big-tech",
+      "established-product"
+    ],
+    "careersUrl": "https://careers.adobe.com/",
+    "description": "Creative and digital experience software.",
+    "evidenceUrl": "https://careers.adobe.com/",
+    "funding": []
+  },
+  {
+    "id": "gitlab",
+    "name": "GitLab",
+    "aliases": [
+      "GitLab"
+    ],
+    "sources": [
+      "greenhouse:gitlab"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://about.gitlab.com/jobs/",
+    "description": "Software development and delivery tools.",
+    "evidenceUrl": "https://about.gitlab.com/jobs/",
+    "funding": []
+  },
+  {
+    "id": "canonical",
+    "name": "Canonical",
+    "aliases": [
+      "Canonical"
+    ],
+    "sources": [
+      "greenhouse:canonical"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://canonical.com/careers",
+    "description": "Ubuntu and open source software.",
+    "evidenceUrl": "https://canonical.com/careers",
+    "funding": []
+  },
+  {
+    "id": "mongodb",
+    "name": "MongoDB",
+    "aliases": [
+      "MongoDB"
+    ],
+    "sources": [
+      "greenhouse:mongodb"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://www.mongodb.com/careers",
+    "description": "Database and developer software.",
+    "evidenceUrl": "https://www.mongodb.com/careers",
+    "funding": []
+  },
+  {
+    "id": "cloudflare",
+    "name": "Cloudflare",
+    "aliases": [
+      "Cloudflare"
+    ],
+    "sources": [
+      "greenhouse:cloudflare"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://www.cloudflare.com/careers/",
+    "description": "Internet infrastructure and security.",
+    "evidenceUrl": "https://www.cloudflare.com/careers/",
+    "funding": []
+  },
+  {
+    "id": "stripe",
+    "name": "Stripe",
+    "aliases": [
+      "Stripe"
+    ],
+    "sources": [
+      "greenhouse:stripe"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://stripe.com/jobs",
+    "description": "Payments and financial infrastructure.",
+    "evidenceUrl": "https://stripe.com/jobs",
+    "funding": []
+  },
+  {
+    "id": "figma",
+    "name": "Figma",
+    "aliases": [
+      "Figma"
+    ],
+    "sources": [
+      "greenhouse:figma"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://www.figma.com/careers/",
+    "description": "Collaborative design and product tools.",
+    "evidenceUrl": "https://www.figma.com/careers/",
+    "funding": []
+  },
+  {
+    "id": "harness",
+    "name": "Harness",
+    "aliases": [
+      "Harness"
+    ],
+    "sources": [
+      "greenhouse:harnessinc"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://www.harness.io/company/careers",
+    "description": "Software delivery and application security tools.",
+    "evidenceUrl": "https://www.harness.io/company/careers",
+    "funding": [
+      {
+        "announced": "2025-12-11",
+        "round": "Series E financing",
+        "amount": "US$240M, including a planned US$40M tender offer",
+        "sourceUrl": "https://www.harness.io/press-and-news/harness-announces-240m-financing-round-led-by-goldman-sachs"
+      }
+    ]
+  },
+  {
+    "id": "databricks",
+    "name": "Databricks",
+    "aliases": [
+      "Databricks"
+    ],
+    "sources": [
+      "greenhouse:databricks"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://www.databricks.com/company/careers",
+    "description": "Data and AI platforms.",
+    "evidenceUrl": "https://www.databricks.com/company/careers",
+    "funding": [
+      {
+        "announced": "2025-12-16",
+        "round": "Series L announced",
+        "amount": "More than US$4B announced",
+        "sourceUrl": "https://www.databricks.com/company/newsroom/press-releases/databricks-surpasses-4-8b-revenue-run-rate-growing-55-year-over-year"
+      }
+    ]
+  },
+  {
+    "id": "cloudsek",
+    "name": "CloudSEK",
+    "aliases": [
+      "CloudSEK"
+    ],
+    "sources": [
+      "greenhouse:cloudsek"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://www.cloudsek.com/careers",
+    "description": "Digital risk and cybersecurity software.",
+    "evidenceUrl": "https://www.cloudsek.com/careers",
+    "funding": []
+  },
+  {
+    "id": "drivetrain",
+    "name": "Drivetrain",
+    "aliases": [
+      "Drivetrain"
+    ],
+    "sources": [
+      "lever:drivetrain"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://www.drivetrain.ai/careers",
+    "description": "Business planning and finance software.",
+    "evidenceUrl": "https://www.drivetrain.ai/careers",
+    "funding": []
+  },
+  {
+    "id": "nagarro",
+    "name": "Nagarro",
+    "aliases": [
+      "Nagarro"
+    ],
+    "sources": [
+      "smartrecruiters:nagarro1"
+    ],
+    "groups": [
+      "services"
+    ],
+    "careersUrl": "https://www.nagarro.com/en/careers",
+    "description": "Digital engineering and consulting services.",
+    "evidenceUrl": "https://www.nagarro.com/en/careers",
+    "funding": []
+  },
+  {
+    "id": "sopra-steria",
+    "name": "Sopra Steria",
+    "aliases": [
+      "Sopra Steria"
+    ],
+    "sources": [
+      "smartrecruiters:soprasteria1"
+    ],
+    "groups": [
+      "services"
+    ],
+    "careersUrl": "https://www.soprasteria.com/careers",
+    "description": "Technology consulting and digital services.",
+    "evidenceUrl": "https://www.soprasteria.com/careers",
+    "funding": []
+  },
+  {
+    "id": "lingaro",
+    "name": "Lingaro",
+    "aliases": [
+      "Lingaro",
+      "Lingaro Group"
+    ],
+    "sources": [
+      "lever:lingarogroup"
+    ],
+    "groups": [
+      "services"
+    ],
+    "careersUrl": "https://lingarogroup.com/careers",
+    "description": "Data, analytics and technology services.",
+    "evidenceUrl": "https://lingarogroup.com/careers",
+    "funding": []
+  },
+  {
+    "id": "paypay-india",
+    "name": "PayPay India",
+    "aliases": [
+      "PayPay India"
+    ],
+    "sources": [
+      "greenhouse:pay2dc"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/pay2dc",
+    "description": "Payment products and engineering.",
+    "evidenceUrl": "https://www.paypayindia.co.in/",
+    "funding": []
+  },
+  {
+    "id": "krafton-india",
+    "name": "KRAFTON India",
+    "aliases": [
+      "KRAFTON India"
+    ],
+    "sources": [
+      "greenhouse:kraftonindia"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/kraftonindia",
+    "description": "Games and interactive entertainment.",
+    "evidenceUrl": "https://krafton.in/",
+    "funding": []
+  },
+  {
+    "id": "quince",
+    "name": "Quince",
+    "aliases": [
+      "Quince"
+    ],
+    "sources": [
+      "greenhouse:quince"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/quince",
+    "description": "Consumer commerce products.",
+    "evidenceUrl": "https://www.quince.com/",
+    "funding": []
+  },
+  {
+    "id": "anaplan",
+    "name": "Anaplan",
+    "aliases": [
+      "Anaplan"
+    ],
+    "sources": [
+      "greenhouse:anaplan"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/anaplan",
+    "description": "Enterprise planning software.",
+    "evidenceUrl": "https://www.anaplan.com/",
+    "funding": []
+  },
+  {
+    "id": "okta",
+    "name": "Okta",
+    "aliases": [
+      "Okta"
+    ],
+    "sources": [
+      "greenhouse:okta"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/okta",
+    "description": "Identity and access management software.",
+    "evidenceUrl": "https://www.okta.com/",
+    "funding": []
+  },
+  {
+    "id": "rubrik",
+    "name": "Rubrik",
+    "aliases": [
+      "Rubrik"
+    ],
+    "sources": [
+      "greenhouse:rubrik"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/rubrik",
+    "description": "Data security and recovery software.",
+    "evidenceUrl": "https://www.rubrik.com/",
+    "funding": []
+  },
+  {
+    "id": "netskope",
+    "name": "Netskope",
+    "aliases": [
+      "Netskope"
+    ],
+    "sources": [
+      "greenhouse:netskope"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/netskope",
+    "description": "Cloud security products.",
+    "evidenceUrl": "https://www.netskope.com/",
+    "funding": []
+  },
+  {
+    "id": "zscaler",
+    "name": "Zscaler",
+    "aliases": [
+      "Zscaler"
+    ],
+    "sources": [
+      "greenhouse:zscaler"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/zscaler",
+    "description": "Cloud security products.",
+    "evidenceUrl": "https://www.zscaler.com/",
+    "funding": []
+  },
+  {
+    "id": "elastic",
+    "name": "Elastic",
+    "aliases": [
+      "Elastic"
+    ],
+    "sources": [
+      "greenhouse:elastic"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/elastic",
+    "description": "Search, observability and security software.",
+    "evidenceUrl": "https://www.elastic.co/",
+    "funding": []
+  },
+  {
+    "id": "grafana-labs",
+    "name": "Grafana Labs",
+    "aliases": [
+      "Grafana Labs"
+    ],
+    "sources": [
+      "greenhouse:grafanalabs"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/grafanalabs",
+    "description": "Observability and monitoring products.",
+    "evidenceUrl": "https://grafana.com/",
+    "funding": []
+  },
+  {
+    "id": "twilio",
+    "name": "Twilio",
+    "aliases": [
+      "Twilio"
+    ],
+    "sources": [
+      "greenhouse:twilio"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/twilio",
+    "description": "Communication and customer engagement software.",
+    "evidenceUrl": "https://www.twilio.com/",
+    "funding": []
+  },
+  {
+    "id": "inmobi",
+    "name": "InMobi",
+    "aliases": [
+      "InMobi"
+    ],
+    "sources": [
+      "greenhouse:inmobi"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/inmobi",
+    "description": "Advertising and consumer technology.",
+    "evidenceUrl": "https://www.inmobi.com/",
+    "funding": []
+  },
+  {
+    "id": "fivetran",
+    "name": "Fivetran",
+    "aliases": [
+      "Fivetran"
+    ],
+    "sources": [
+      "greenhouse:fivetran"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/fivetran",
+    "description": "Automated data movement software.",
+    "evidenceUrl": "https://www.fivetran.com/",
+    "funding": []
+  },
+  {
+    "id": "diligent",
+    "name": "Diligent",
+    "aliases": [
+      "Diligent"
+    ],
+    "sources": [
+      "greenhouse:diligentcorporation"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/diligentcorporation",
+    "description": "Governance, risk and compliance software.",
+    "evidenceUrl": "https://www.diligent.com/",
+    "funding": []
+  },
+  {
+    "id": "toast",
+    "name": "Toast",
+    "aliases": [
+      "Toast"
+    ],
+    "sources": [
+      "greenhouse:toast"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/toast",
+    "description": "Restaurant operations and payments software.",
+    "evidenceUrl": "https://pos.toasttab.com/",
+    "funding": []
+  },
+  {
+    "id": "sonicwall",
+    "name": "SonicWall",
+    "aliases": [
+      "SonicWall"
+    ],
+    "sources": [
+      "greenhouse:sonicwall"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/sonicwall",
+    "description": "Cybersecurity products.",
+    "evidenceUrl": "https://www.sonicwall.com/",
+    "funding": []
+  },
+  {
+    "id": "hyreo",
+    "name": "Hyreo",
+    "aliases": [
+      "Hyreo"
+    ],
+    "sources": [
+      "greenhouse:hyreo"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/hyreo",
+    "description": "Recruiting and candidate engagement software.",
+    "evidenceUrl": "https://hyreo.com/",
+    "funding": []
+  },
+  {
+    "id": "sigmoid",
+    "name": "Sigmoid",
+    "aliases": [
+      "Sigmoid"
+    ],
+    "sources": [
+      "greenhouse:sigmoid"
+    ],
+    "groups": [
+      "services"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/sigmoid",
+    "description": "Data engineering and analytics services.",
+    "evidenceUrl": "https://www.sigmoid.com/",
+    "funding": []
+  },
+  {
+    "id": "openfx",
+    "name": "OpenFX",
+    "aliases": [
+      "OpenFX"
+    ],
+    "sources": [
+      "greenhouse:openfx"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/openfx",
+    "description": "Cross-border financial infrastructure.",
+    "evidenceUrl": "https://www.openfx.com/",
+    "funding": []
+  },
+  {
+    "id": "meltplan",
+    "name": "MeltPlan",
+    "aliases": [
+      "MeltPlan"
+    ],
+    "sources": [
+      "greenhouse:meltplan"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/meltplan",
+    "description": "AI software for construction planning.",
+    "evidenceUrl": "https://www.meltplan.com/careers",
+    "funding": []
+  },
+  {
+    "id": "poppulo",
+    "name": "Poppulo",
+    "aliases": [
+      "Poppulo"
+    ],
+    "sources": [
+      "greenhouse:poppulo"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://job-boards.greenhouse.io/poppulo",
+    "description": "Employee communications and digital signage software.",
+    "evidenceUrl": "https://www.poppulo.com/",
+    "funding": []
+  },
+  {
+    "id": "greenlight",
+    "name": "Greenlight",
+    "aliases": [
+      "Greenlight"
+    ],
+    "sources": [
+      "lever:greenlight"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.lever.co/greenlight",
+    "description": "Family finance products.",
+    "evidenceUrl": "https://greenlight.com/",
+    "funding": []
+  },
+  {
+    "id": "hevo-data",
+    "name": "Hevo Data",
+    "aliases": [
+      "Hevo Data"
+    ],
+    "sources": [
+      "lever:hevodata"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.lever.co/hevodata",
+    "description": "Data integration software.",
+    "evidenceUrl": "https://hevodata.com/",
+    "funding": []
+  },
+  {
+    "id": "acceldata",
+    "name": "Acceldata",
+    "aliases": [
+      "Acceldata"
+    ],
+    "sources": [
+      "lever:acceldata"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.lever.co/acceldata",
+    "description": "Data observability software.",
+    "evidenceUrl": "https://www.acceldata.io/",
+    "funding": []
+  },
+  {
+    "id": "meesho",
+    "name": "Meesho",
+    "aliases": [
+      "Meesho"
+    ],
+    "sources": [
+      "lever:meesho"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://jobs.lever.co/meesho",
+    "description": "Consumer commerce marketplace.",
+    "evidenceUrl": "https://www.meesho.com/",
+    "funding": []
+  },
+  {
+    "id": "mindtickle",
+    "name": "Mindtickle",
+    "aliases": [
+      "Mindtickle"
+    ],
+    "sources": [
+      "lever:mindtickle"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.lever.co/mindtickle",
+    "description": "Sales readiness and enablement software.",
+    "evidenceUrl": "https://www.mindtickle.com/",
+    "funding": []
+  },
+  {
+    "id": "highlevel",
+    "name": "HighLevel",
+    "aliases": [
+      "HighLevel"
+    ],
+    "sources": [
+      "lever:gohighlevel"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.lever.co/gohighlevel",
+    "description": "Sales and marketing software.",
+    "evidenceUrl": "https://www.gohighlevel.com/",
+    "funding": []
+  },
+  {
+    "id": "bosch",
+    "name": "Bosch",
+    "aliases": [
+      "Bosch"
+    ],
+    "sources": [
+      "smartrecruiters:boschgroup"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://careers.smartrecruiters.com/BoschGroup",
+    "description": "Engineering, connected products and industrial technology.",
+    "evidenceUrl": "https://www.bosch.com/",
+    "funding": []
+  },
+  {
+    "id": "miratech",
+    "name": "Miratech",
+    "aliases": [
+      "Miratech"
+    ],
+    "sources": [
+      "smartrecruiters:miratech1"
+    ],
+    "groups": [
+      "services"
+    ],
+    "careersUrl": "https://careers.smartrecruiters.com/Miratech1",
+    "description": "Technology and engineering services.",
+    "evidenceUrl": "https://miratechgroup.com/",
+    "funding": []
+  },
+  {
+    "id": "synergy-machines",
+    "name": "Synergy Machines",
+    "aliases": [
+      "Synergy Machines"
+    ],
+    "sources": [
+      "smartrecruiters:synergymachines"
+    ],
+    "groups": [],
+    "careersUrl": "https://careers.smartrecruiters.com/SynergyMachines",
+    "description": "Employer opportunities from its official careers board.",
+    "evidenceUrl": "https://careers.smartrecruiters.com/SynergyMachines",
+    "funding": []
+  },
+  {
+    "id": "sia",
+    "name": "Sia",
+    "aliases": [
+      "Sia"
+    ],
+    "sources": [
+      "smartrecruiters:sia"
+    ],
+    "groups": [
+      "services"
+    ],
+    "careersUrl": "https://careers.smartrecruiters.com/sia",
+    "description": "Management and technology consulting.",
+    "evidenceUrl": "https://www.sia-partners.com/",
+    "funding": []
+  },
+  {
+    "id": "nec-software-solutions",
+    "name": "NEC Software Solutions",
+    "aliases": [
+      "NEC Software Solutions"
+    ],
+    "sources": [
+      "smartrecruiters:necsws"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://careers.smartrecruiters.com/necsws",
+    "description": "Public services software and technology.",
+    "evidenceUrl": "https://www.necsws.com/",
+    "funding": []
+  },
+  {
+    "id": "supabase",
+    "name": "Supabase",
+    "aliases": [
+      "Supabase"
+    ],
+    "sources": [
+      "ashby:supabase"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/supabase",
+    "description": "Open source backend and database products.",
+    "evidenceUrl": "https://supabase.com/",
+    "funding": []
+  },
+  {
+    "id": "notion",
+    "name": "Notion",
+    "aliases": [
+      "Notion"
+    ],
+    "sources": [
+      "ashby:notion"
+    ],
+    "groups": [
+      "established-product"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/notion",
+    "description": "Workspace and productivity software.",
+    "evidenceUrl": "https://www.notion.com/",
+    "funding": []
+  },
+  {
+    "id": "linear",
+    "name": "Linear",
+    "aliases": [
+      "Linear"
+    ],
+    "sources": [
+      "ashby:linear"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/linear",
+    "description": "Product planning and issue tracking software.",
+    "evidenceUrl": "https://linear.app/",
+    "funding": []
+  },
+  {
+    "id": "ashby",
+    "name": "Ashby",
+    "aliases": [
+      "Ashby"
+    ],
+    "sources": [
+      "ashby:ashby"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/ashby",
+    "description": "Recruiting and applicant tracking software.",
+    "evidenceUrl": "https://www.ashbyhq.com/",
+    "funding": []
+  },
+  {
+    "id": "coder",
+    "name": "Coder",
+    "aliases": [
+      "Coder"
+    ],
+    "sources": [
+      "ashby:coder"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/coder",
+    "description": "Cloud development environments.",
+    "evidenceUrl": "https://coder.com/",
+    "funding": []
+  },
+  {
+    "id": "plane",
+    "name": "Plane",
+    "aliases": [
+      "Plane"
+    ],
+    "sources": [
+      "ashby:plane"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/plane",
+    "description": "Product and engineering opportunities from its official careers board.",
+    "evidenceUrl": "https://jobs.ashbyhq.com/plane",
+    "funding": []
+  },
+  {
+    "id": "sarvam",
+    "name": "Sarvam AI",
+    "aliases": [
+      "Sarvam AI"
+    ],
+    "sources": [
+      "ashby:sarvam"
+    ],
+    "groups": [
+      "growth-startups"
+    ],
+    "careersUrl": "https://jobs.ashbyhq.com/sarvam",
+    "description": "AI products and platforms for India.",
+    "evidenceUrl": "https://www.sarvam.ai/",
+    "funding": []
+  }
+]

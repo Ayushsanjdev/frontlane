@@ -90,14 +90,14 @@ Configure Google OAuth with the deployed callback URL. Keep secrets in your host
 
 Daily scheduling uses the free cron-job.org service and does not depend on GitHub Actions. See [the scheduler configuration and troubleshooting guide](docs/CRON-JOB-ORG.md). Enable only one scheduler:
 
-- **cron-job.org (active):** job `8632316` calls `GET https://frontlanejobs.vercel.app/api/cron/jobs` daily at `30 2 * * *` UTC (8 AM IST), with `Authorization: Bearer <CRON_SECRET>`. The token matches the Vercel Production environment. Response-body storage is off. The initial scheduler test returned HTTP 200 in 16.65 seconds, publishing 50 jobs with no failed sources.
+- **cron-job.org (active):** job `8632316` calls `GET https://frontlanejobs.vercel.app/api/cron/jobs` three times daily at `30 2,10,18 * * *` UTC (08:00, 16:00 and 00:00 IST), with `Authorization: Bearer <CRON_SECRET>`. The token matches the Vercel Production environment. Response-body storage is off. The initial scheduler test returned HTTP 200 in 16.65 seconds, publishing 50 jobs with no failed sources.
 - **GitHub Actions (manual recovery only):** set repository variable `APP_URL` and secret `INGEST_TOKEN`, then use `.github/workflows/jobs.yml` → **Run workflow**. Automatic scheduling is removed so an unlocked GitHub account cannot create a duplicate refresh schedule.
 - **Server cron:** set `APP_URL` and `INGEST_TOKEN` on the worker. For a server using UTC, run `30 2 * * * cd /absolute/path/frontlanejobs && pnpm jobs:refresh`.
 - **Vercel Cron (alternative, currently unconfigured):** re-add a `crons` entry to `apps/web/vercel.json` only if switching back, then enable Vercel Cron and disable the external job. Vercel sends `Authorization: Bearer <CRON_SECRET>` automatically. Cron jobs run only on production deployments; Hobby supports daily schedules with approximate timing. See [Vercel cron management](https://vercel.com/docs/cron-jobs/manage-cron-jobs) and [plan limits](https://vercel.com/docs/cron-jobs/usage-and-pricing).
 
-The daily refresh targets **50 available frontend jobs** eligible for India or explicitly worldwide remote work. It reads public Greenhouse, Lever, and SmartRecruiters employer feeds, deduplicates application URLs, and selects across employers, employment types, and remote/hybrid/onsite arrangements. Every automated listing links to the employer-provided career page or hosted ATS posting. Part-time, contract, and freelance roles are included when employers supply them; no fixed mix or 50-job minimum is guaranteed by upstream availability.
+The refresh publishes **all eligible available frontend jobs**, with up to 50 round-robin featured picks. Public Greenhouse, Lever, SmartRecruiters, Ashby and Amazon feeds supply India or explicitly worldwide roles. No paid job API is required. Upstream availability determines the actual counts.
 
-Each successful employer snapshot replaces that employer's portion of the daily selection, so jobs outside the current selection become inactive. Failed or malformed sources retain their previous listings. Manual/research and starter listings are independent and remain untouched, so the total board can exceed 50. The worker output and cron response include `summary.target`, `published`, `shortfall`, and `failedSources`. A complete source failure returns HTTP 503 or a nonzero worker exit status; a shortfall is reported without inventing listings. `/updates` shows per-source selected counts and check times.
+Each complete employer snapshot publishes every eligible available role and closes roles absent from that source. Failed or malformed sources preserve previous listings. Manual/research listings remain independent. `summary.published` counts available roles, `target:50` describes the featured target, and `/updates` shows source counts and actual check dates. Apply migration `011` before running the expanded registry.
 
 For production, enable **only one** scheduler above. With GitHub Actions, point `APP_URL` at the production HTTPS origin and configure the matching `INGEST_TOKEN` in both GitHub and the app. Use that workflow's **Run workflow** button or `pnpm jobs:refresh` for the initial refresh, then inspect its summary and `/updates`. Localhost does not run the production schedule automatically.
 
@@ -126,3 +126,7 @@ Legacy tracker retrieval caps at 1,000 rows; the web workspace uses cursor pagin
 ## Third-party licenses
 
 Preserve the included shadcn license in `apps/web/vendor/` and licenses of other third-party dependencies.
+
+Remote worldwide and India-eligible frontend jobs have a dedicated `/jobs/remote` board. See [remote sources, refresh command and scheduler setup](docs/REMOTE-JOBS.md).
+
+Explore collections are available at `/explore`: FAANG, Big Tech, product companies, growth startups, services, recently funded companies and Fresher Special. See [Explore setup and maintenance](docs/EXPLORE.md) for company/funding updates and sourcing. Explore uses the existing `.env.local` setup and requires no additional environment variables in local development or production.

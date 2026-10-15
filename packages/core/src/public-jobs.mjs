@@ -1,3 +1,4 @@
+import {resolveCompany} from '@frontlanejobs/database/companies';
 import {createHash} from 'node:crypto';
 import {z} from 'zod';
 import {JobInput,canonicalUrl,jobId} from './ingestion.mjs';
@@ -49,6 +50,7 @@ export async function publishPublicJob(db,userId,input,{now=new Date()}={}){
     if(duplicate.rows.length)throw new PublicJobError('This application link is already listed on the job board.',409);
     const job=JobInput.parse({...fields,checked:now.toISOString(),posted:null,caveat:'Community-submitted listing. Verify availability, employer identity and requirements before applying.'});
     const id=jobId('community',job),payload={...job,id,source:'community',discovered:now.toISOString().slice(0,10)};
+    const company=resolveCompany(payload);if(company)payload.companyId=company.id;
     await client.query('INSERT INTO jobs(id,source,canonical_url,payload,discovered_at) VALUES($1,$2,$3,$4,$5)',[id,'community',job.url,payload,now]);
     await client.query('INSERT INTO job_first_publications(canonical_url,job_id,published_at) VALUES($1,$2,$3) ON CONFLICT DO NOTHING',[job.url,id,now]);
     await client.query('INSERT INTO job_publications(id,owner_id,job_id,body_hash,created_at) VALUES($1,$2,$3,$4,$5)',[submissionId,userId,id,hash,now]);

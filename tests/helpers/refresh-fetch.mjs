@@ -14,6 +14,8 @@ globalThis.fetch=async(url,options)=>{
   }
   if(process.env.FAIL_FEEDS==='true')return {ok:false,status:503};
   if(target.hostname==='api.smartrecruiters.com')return {ok:true,json:async()=>({content:[],totalFound:0})};
+  if(target.hostname==='www.amazon.jobs')return {ok:true,json:async()=>({hits:0,jobs:[]})};
+  if(target.hostname==='api.ashbyhq.com')return {ok:true,json:async()=>({jobs:[]})};
   const slug=target.hostname==='boards-api.greenhouse.io'?target.pathname.split('/').at(-2):target.pathname.split('/').at(-1);
   const jobs=Array.from({length:10},(_,id)=>({
     id:String(id),title:'Frontend Engineer',text:'Frontend Engineer',location:{name:'India'},categories:{location:'India'},

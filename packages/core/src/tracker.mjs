@@ -1,3 +1,4 @@
+import {RemoteInput} from './remote-eligibility.mjs';
 import {WorkspaceInput} from './workspace-model.mjs';
 import {JobEnrichmentInput} from './job-enrichment.mjs';
 import {z} from 'zod';
@@ -13,7 +14,7 @@ const url=z.string().url().max(2000).refine(value=>{
   return ['http:','https:'].includes(u.protocol)&&!u.username&&!u.password;
 },'Use an HTTP or HTTPS application link');
 const Job=z.object({
-  id:z.string().trim().min(1).max(200),
+  id:z.string().trim().min(1).max(200),featured:z.boolean().optional(),
   title:z.string().trim().min(1).max(160),
   company:z.string().trim().min(1).max(120),
   location:text(200),mode:z.enum(['Remote','Hybrid','Onsite']),
@@ -22,7 +23,7 @@ const Job=z.object({
   summary:text(1800),caveat:text(600),url,source:text(101),
   discovered:day,checked:z.union([z.string().datetime({offset:true}),z.literal('')]),
   posted:z.string().datetime({offset:true}).nullable(),
-  eligibility:text(400),degree:text(300),enrichment:JobEnrichmentInput.optional(),availability:z.enum(['available','closed','unknown']).optional(),companyId:text(101).optional(),
+  eligibility:text(400),degree:text(300),enrichment:JobEnrichmentInput.optional(),remote:RemoteInput.optional(),availability:z.enum(['available','closed','unknown']).optional(),companyId:text(101).optional(),
 }).strict();
 const Application=z.object({
   id:z.union([z.string().uuid(),z.literal('')]).optional(),

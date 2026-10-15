@@ -5,7 +5,8 @@ import {filterSeedJobs} from './jobs.mjs';
 import {WorkspaceError} from './tracker-store.mjs';
 export function normalizeSearchCriteria(value){
   const input=new URLSearchParams(z.string().max(2000).parse(value)),output=new URLSearchParams();
-  for(const key of ['q','type','mode','stack','city','seniority','compensationKnown','salaryMin','currency','payPeriod'])for(const entry of input.getAll(key).slice(0,30))if(entry&&entry!=='All')output.append(key,entry.slice(0,100));
+  for(const key of ['companyGroup','companyId','recentlyFunded','freshers','q','type','mode','stack','city','seniority','compensationKnown','salaryMin','currency','payPeriod'])for(const entry of input.getAll(key).slice(0,30))if(entry&&entry!=='All')output.append(key,entry.slice(0,100));
+  if(input.get('collection')==='remote')output.set('collection','remote');
   output.sort();return output.toString();
 }
 const searchInput=z.object({id:z.string().uuid().optional(),name:z.string().trim().min(1).max(100),criteria:z.string().max(2000),enabled:z.boolean()}).strict();

@@ -15,15 +15,15 @@ test('rechecking and cross-source publication create only one first-publication 
     assert.equal(count.rows[0].n,1);
   }finally{await pg.close()}
 });
-test('daily selection does not close roles still present in a complete employer feed',async()=>{
+test('all available roles stay public until a complete employer feed closes them',async()=>{
   const pg=new PGlite();await pg.exec(await readFile(new URL('../packages/database/schema/001-init.sql',import.meta.url),'utf8'));
   const db={connect:async()=>({query:(sql,args)=>pg.query(sql,args),release(){}})};
   try{
     const hidden={...example,url:'https://example.com/hidden'};
     await ingest({source:'lever:example',runId:'full-feed-one',jobs:[example],availableJobs:[example,hidden],completeSnapshot:true},db);
     let row=(await pg.query('SELECT active,source_available FROM jobs WHERE canonical_url=$1',[hidden.url])).rows[0];
-    assert.deepEqual(row,{active:false,source_available:true});
-    assert.equal((await pg.query('SELECT count(*)::int AS n FROM job_first_publications')).rows[0].n,1);
+    assert.deepEqual(row,{active:true,source_available:true});
+    assert.equal((await pg.query('SELECT count(*)::int AS n FROM job_first_publications')).rows[0].n,2);
     await ingest({source:'lever:example',runId:'full-feed-two',jobs:[example],availableJobs:[example],completeSnapshot:true},db);
     row=(await pg.query('SELECT active,source_available FROM jobs WHERE canonical_url=$1',[hidden.url])).rows[0];
     assert.deepEqual(row,{active:false,source_available:false});

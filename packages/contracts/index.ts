@@ -1,11 +1,13 @@
-export type JobEnrichment={description:string;arrangement:'Remote'|'Hybrid'|'Onsite'|'Unknown';seniority?:'Junior'|'Mid'|'Senior'|'Lead'|'Staff';yearsMin?:number;yearsMax?:number;compensation?:{min:number;max:number;currency:string;period:'year'|'month'|'hour';sourceText:string};requiredSkills?:string[];preferredSkills?:string[];benefits?:string[];evidence?:string};
-export type Job={id:string;title:string;company:string;location:string;mode:'Remote'|'Hybrid'|'Onsite';type:'Full-time'|'Freelance'|'Part-time'|'Contract';salary:string;tags:string[];experience:string;summary:string;caveat:string;url:string;source:string;discovered:string;checked:string;posted:string|null;eligibility:string;degree:string;enrichment?:JobEnrichment;companyId?:string;availability?:'available'|'closed'|'unknown'};
+export type RemoteEligibility={scope:'worldwide'|'india';evidence:string;timezone?:string;lastSeen:string;sourceName?:'Remote OK'|'We Work Remotely'|'Hacker News';sourceUrl?:string};
+export type JobEnrichment={careerStage?:'Internship'|'Graduate'|'Entry-level';description:string;arrangement:'Remote'|'Hybrid'|'Onsite'|'Unknown';seniority?:'Junior'|'Mid'|'Senior'|'Lead'|'Staff';yearsMin?:number;yearsMax?:number;compensation?:{min:number;max:number;currency:string;period:'year'|'month'|'hour';sourceText:string};requiredSkills?:string[];preferredSkills?:string[];benefits?:string[];evidence?:string};
+export type Job={id:string;featured?:boolean;title:string;company:string;location:string;mode:'Remote'|'Hybrid'|'Onsite';type:'Full-time'|'Freelance'|'Part-time'|'Contract';salary:string;tags:string[];experience:string;summary:string;caveat:string;url:string;source:string;discovered:string;checked:string;posted:string|null;eligibility:string;degree:string;enrichment?:JobEnrichment;remote?:RemoteEligibility;companyId?:string;availability?:'available'|'closed'|'unknown'};
 export const stages=['Saved','Preparing','Applied','Interview','Offer','Rejected','Withdrawn'] as const;
 export type Stage=typeof stages[number];
 export type Application={workspace?:ApplicationWorkspace;revision?:number;id:string;jobId:string;job:Job;stage:Stage;notes:string;answers:string;appliedAt:string;followUp:string;evidence:string;updatedAt:string};
 export type Profile={matchingPreferences?:MatchingPreferences;name:string;location:string;skills:string;experience:string;salary:string;availability:string;portfolio:string;resumeUrl:string;preference:string};
 
-export type JobCollection={jobs:Job[];total:number;page:number;limit:number;lastSync:string|null;warning?:string;sources?:unknown[]};
+export type FeedHealth={configured:number;healthy:number;failed:number;partial:number;pending:number;lastSuccess:string|null;lastAttempt:string|null};
+export type JobCollection={feedHealth?:FeedHealth;jobs:Job[];total:number;page:number;limit:number;lastSync:string|null;warning?:string;sources?:unknown[]};
 
 export type MobileUser={userId:string;name:string;email:string};
 export type MobileSession={token:string;user:MobileUser;expiresAt:string};

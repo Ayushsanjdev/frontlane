@@ -26,7 +26,7 @@ test('registry-backed cron includes discovered employers and missing keys skip s
     assert.equal(skipped.status,200);assert.equal((await skipped.json()).searchesReserved,0);
     await f.db.query("INSERT INTO employer_sources(source,provider,slug,company,origin,verified_at) VALUES('greenhouse:routenewco','greenhouse','routenewco','Route New Co','discovered',now())");
     await f.db.query("INSERT INTO employer_sources(source,provider,slug,company,origin,verified_at) SELECT 'greenhouse:xco'||n,'greenhouse','xco'||n,'X Co '||n,'discovered',now() FROM generate_series(1,21) n");
-    globalThis.fetch=async input=>Response.json(String(input).includes('smartrecruiters')?{content:[],totalFound:0}:String(input).includes('greenhouse')?{jobs:[]}:[]);
+    globalThis.fetch=async input=>Response.json(String(input).includes('amazon.jobs')?{hits:0,jobs:[]}:String(input).includes('ashbyhq')?{jobs:[]}:String(input).includes('smartrecruiters')?{content:[],totalFound:0}:String(input).includes('greenhouse')?{jobs:[]}:[]);
     const refreshed=await cron.GET(new Request('https://example.com/api/cron/jobs',{headers:auth}));
     assert.equal(refreshed.status,200);
     const refreshedBody=await refreshed.json();

@@ -34,6 +34,8 @@ test('selection priority does not synchronize with the discovered polling window
     const seen=new Set();
     const fetchImpl=async input=>{
       const url=new URL(input),slug=url.pathname.split('/').at(-2);
+      if(url.hostname==='www.amazon.jobs')return Response.json({hits:0,jobs:[]});
+      if(url.hostname==='api.ashbyhq.com')return Response.json({jobs:[]});
       if(url.hostname==='api.smartrecruiters.com')return Response.json({content:[],totalFound:0});
       if(url.hostname==='api.lever.co')return Response.json([{id:'1',text:'Frontend Engineer',categories:{location:'India'},descriptionPlain:'React',hostedUrl:input+'/job'}]);
       return Response.json({jobs:[{id:1,title:'Frontend Engineer',location:{name:'India'},content:'React',absolute_url:`https://job-boards.greenhouse.io/${slug}/jobs/1`}]});

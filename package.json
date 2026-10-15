@@ -22,7 +22,8 @@
     "mobile:dev": "pnpm --filter @frontlanejobs/mobile dev",
     "mobile:android": "pnpm --filter @frontlanejobs/mobile android",
     "mobile:ios": "pnpm --filter @frontlanejobs/mobile ios",
-    "mobile:export": "pnpm --filter @frontlanejobs/mobile export"
+    "mobile:export": "pnpm --filter @frontlanejobs/mobile export",
+    "jobs:refresh:remote": "node --env-file-if-exists=.env.local apps/worker/scripts/refresh-remote-jobs.mjs"
   },
   "dependencies": {
     "@frontlanejobs/core": "workspace:*",

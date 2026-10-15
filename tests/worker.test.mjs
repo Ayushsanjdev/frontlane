@@ -17,12 +17,12 @@ test('discovery worker sends cron credentials, validates receipts, and surfaces 
   if(scenario==='success')assert.equal(JSON.parse(result.stdout).registered,1);
  }
 });
-test('production refresh worker publishes 50 jobs and emits a summary',()=>{
+test('production refresh worker publishes complete inventory and emits a summary',()=>{
  const result=spawnSync(process.execPath,['--import',fileURLToPath(new URL('./helpers/refresh-fetch.mjs',import.meta.url)),fileURLToPath(new URL('../apps/worker/scripts/refresh-jobs.mjs',import.meta.url))],{
   env:{...process.env,APP_URL:'https://frontlane.example',INGEST_TOKEN:'t'.repeat(32),FAIL_FEEDS:'false'},encoding:'utf8',timeout:10000,
  });
  assert.equal(result.status,0,result.stderr);
- assert.deepEqual(JSON.parse(result.stdout).summary,{target:50,published:50,shortfall:0,failedSources:0});
+ assert.deepEqual(JSON.parse(result.stdout).summary,{target:50,published:390,shortfall:0,failedSources:0});
  assert.ok(JSON.parse(result.stdout).sources.some(row=>row.source==='greenhouse:workernewco'));
 });
 

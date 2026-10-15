@@ -74,7 +74,7 @@ test('cron processes sources on one connection and releases it after commit',asy
   connects++;assert.equal(connects,1,'must reuse the lock connection');return client;
  },query:async()=>assert.fail('must use lock connection for status writes')};
  const original=globalThis.fetch;
- globalThis.fetch=async url=>({ok:true,json:async()=>String(url).includes('smartrecruiters')?{content:[],totalFound:0}:String(url).includes('greenhouse')?{jobs:[]}:[]});
+ globalThis.fetch=async url=>({ok:true,json:async()=>String(url).includes('amazon.jobs')?{hits:0,jobs:[]}:String(url).includes('ashbyhq')?{jobs:[]}:String(url).includes('smartrecruiters')?{content:[],totalFound:0}:String(url).includes('greenhouse')?{jobs:[]}:[]});
  try{
   const response=await cron.GET(new Request('http://localhost:3000/api/cron/jobs',{headers:{authorization:'Bearer '+'c'.repeat(32)}}));
   assert.equal(response.status,200);

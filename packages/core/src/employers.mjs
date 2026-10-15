@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {SOURCES} from './sources.mjs';
 import {discoveryTransaction} from './discovery-store.mjs';
 
-const sourceTuple=z.tuple([z.enum(['greenhouse','lever','smartrecruiters']),z.string().regex(/^[a-z0-9][a-z0-9_-]{0,80}$/i),z.string().min(1).max(120)]);
+const sourceTuple=z.tuple([z.enum(['greenhouse','lever','smartrecruiters','ashby','amazon']),z.string().regex(/^[a-z0-9][a-z0-9_-]{0,80}$/i),z.string().min(1).max(120)]);
 const selectionSchema=z.object({sources:z.array(sourceTuple).min(1).max(200),deferred:z.number().int().nonnegative(),rotation:z.number().int().nonnegative()}).strict();
 export function validateSourceSelection(value){
   const selection=selectionSchema.parse(value);

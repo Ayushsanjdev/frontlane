@@ -3,7 +3,7 @@ import {authorized} from '@frontlanejobs/core/ingestion';
 import {seedEmployers,registeredSources,markEmployerChecks} from '@frontlanejobs/core/employers';
 import {database} from '@frontlanejobs/database/client';
 export const runtime='nodejs';
-const sourceId=z.string().regex(/^(greenhouse|lever|smartrecruiters):[a-z0-9][a-z0-9_-]{0,80}$/);
+const sourceId=z.string().regex(/^(greenhouse|lever|smartrecruiters|ashby|amazon):[a-z0-9][a-z0-9_-]{0,80}$/);
 const checked=z.object({checkedSources:z.array(sourceId).max(100),selectedSources:z.array(sourceId).max(100).default([])}).strict().refine(value=>value.selectedSources.every(source=>value.checkedSources.includes(source)));
 
 export async function GET(request:Request){

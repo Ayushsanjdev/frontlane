@@ -1,3 +1,6 @@
+import {ashbyJobs} from './ashby.mjs';
+import {amazonJobs} from './amazon.mjs';
+import {classifyRemote} from './remote-eligibility.mjs';
 import {enrichJob,technologyTokens} from './job-enrichment.mjs';
 import {randomUUID} from 'node:crypto';
 import {decodeHTMLStrict} from 'entities';
@@ -6,6 +9,16 @@ import {smartRecruitersJobs} from './smartrecruiters.mjs';
 
 export const DAILY_JOB_TARGET=50;
 export const SOURCES=[
+  ['amazon','amazon','Amazon'],
+  ['ashby','plane','Plane'],
+  ['ashby','sarvam','Sarvam AI'],
+  ['ashby','supabase','Supabase'],
+  ['ashby','notion','Notion'],
+  ['ashby','linear','Linear'],
+  ['ashby','ashby','Ashby'],
+  ['ashby','coder','Coder'],
+  ['greenhouse','stripe','Stripe'],
+  ['greenhouse','figma','Figma'],
   ['greenhouse','cloudsek','CloudSEK'],
   ['greenhouse','pay2dc','PayPay India'],
   ['greenhouse','kraftonindia','KRAFTON India'],
@@ -65,8 +78,8 @@ export function clean(value){
 
 export function eligible(title,location,description){
   return /front[ -]?end|react|angular|vue(?:\.js)?|\bui\b.*(?:engineer|developer)|(?:engineer|developer).*\bui\b|\bweb\s+(?:engineer|developer)/i.test(title)&&
-    /india|bengaluru|bangalore|hyderabad|pune|mumbai|chennai|gurugram|gurgaon|noida|delhi|worldwide|anywhere in the world/i.test(location)&&
-    !/intern|director|manager/i.test(title)&&
+    /\b(?:india|bengaluru|bangalore|hyderabad|pune|mumbai|chennai|gurugram|gurgaon|noida|delhi|worldwide|anywhere in the world)\b/i.test(location)&&
+    !/director|manager/i.test(title)&&
     !/US citizens only|US residents only|must be based in (the )?(US|United States|Canada)|full (US|EST) (business|working)/i.test(description);
 }
 
@@ -96,10 +109,13 @@ function normalize(row,provider,company,checked){
     enrichment:enrichJob({title,description,arrangement:row.workplaceType==='remote'?'Remote':row.workplaceType==='hybrid'?'Hybrid':/on[- ]?site/i.test(row.workplaceType||'')?'Onsite':/remote|home based|worldwide|anywhere in the world/i.test(location)?'Remote':/hybrid/i.test(location)?'Hybrid':'Unknown'}),
     experience:'See employer requirements',summary:description.slice(0,1500),
     caveat:'Review the full employer listing, eligibility and working hours before applying.',
-    url,checked,posted:provider==='smartrecruiters'?row.posted:provider==='lever'&&row.createdAt?new Date(row.createdAt).toISOString():null,
+    url,checked,posted:['smartrecruiters','ashby','amazon'].includes(provider)?row.posted:provider==='lever'&&row.createdAt?new Date(row.createdAt).toISOString():null,
     eligibility:/worldwide|anywhere/i.test(location)?'Worldwide remote':'India location listed',
     degree:/equivalent (practical|professional|work) experience/i.test(description)?'Equivalent experience accepted':'Review employer requirements',
   });
+  if(row.careerStage)normalized.enrichment.careerStage=row.careerStage;
+  const remote=classifyRemote({location,description,arrangement:normalized.enrichment?.arrangement||normalized.mode,checked});
+  if(remote)normalized.remote=remote;
   const pay=normalized.enrichment?.compensation;if(pay)normalized.salary=pay.currency+' '+pay.min.toLocaleString('en-IN')+(pay.max!==pay.min?'–'+pay.max.toLocaleString('en-IN'):'')+' / '+pay.period;
   if(normalized.enrichment?.yearsMin!==undefined)normalized.experience=normalized.enrichment.yearsMin+(normalized.enrichment.yearsMax!==undefined?'–'+normalized.enrichment.yearsMax:'+')+' years';
   return normalized;
@@ -122,12 +138,15 @@ export async function fetchEmployerFeed([provider,slug,company],checked,{signal,
   try{
     let raw;
     const getJson=(url,deadline)=>fetchJson(url,signal&&deadline?AbortSignal.any([signal,deadline]):signal||deadline,fetchImpl,retries);
-    if(provider==='smartrecruiters')raw=await smartRecruitersJobs(slug,getJson,eligible,DAILY_JOB_TARGET,{signal});
-    else{
+    if(provider==='ashby')raw=await ashbyJobs(slug,getJson);
+    else if(provider==='amazon')raw=await amazonJobs(slug,getJson,{signal});
+    else if(provider==='smartrecruiters')raw=await smartRecruitersJobs(slug,getJson,eligible,DAILY_JOB_TARGET,{signal});
+    else if(['greenhouse','lever'].includes(provider)){
       const endpoint=provider==='greenhouse'?`https://boards-api.greenhouse.io/v1/boards/${slug}/jobs?content=true`:`https://api.lever.co/v0/postings/${slug}?mode=json`;
       const data=await getJson(endpoint);
       raw=provider==='greenhouse'?data.jobs:data;
     }
+    else throw Error('Unsupported employer provider');
     if(!Array.isArray(raw))throw Error('Invalid feed');
     // Validate before replacing a snapshot: malformed feeds must preserve existing jobs.
     const jobs=raw.map(row=>normalize(row,provider,company,checked)).filter(Boolean);
@@ -193,9 +212,9 @@ export async function refreshSources(publish,{sources=SOURCES,signal,fetchImpl=f
     if(feed.status==='failed'){outcomes.push(feed);continue}
     const jobs=selected.get(feed.source);
     try{
-      // The snapshot is this employer's share of the daily selection, not its entire feed.
+      // Full snapshots publish all inventory; the bounded selection supplies featured roles.
       const receipt=await publish({source:feed.source,runId,jobs,completeSnapshot:true,...(fullSnapshots?{availableJobs:feed.jobs}:{})});
-      outcomes.push({source:feed.source,status:'ok',matched:jobs.length,available:feed.jobs.length,receipt});
+      outcomes.push({source:feed.source,status:'ok',matched:fullSnapshots?feed.jobs.length:jobs.length,featured:jobs.length,available:feed.jobs.length,receipt});
     }catch(error){outcomes.push({source:feed.source,status:'failed',error:String(error.message).slice(0,160)})}
   }
   return outcomes;

@@ -9,7 +9,8 @@
   "exports": {
     "./client": "./src/client.mjs",
     "./schema": "./schema/001-init.sql",
-    "./seed": "./data/seed.json"
+    "./seed": "./data/seed.json",
+    "./companies": "./src/company-catalog.mjs"
   },
   "scripts": {
     "migrate": "node --env-file-if-exists=../../.env.local scripts/migrate.mjs"

@@ -17,6 +17,8 @@ export async function discoveryFixture(input,options){
   if(url.hostname==='boards-api.greenhouse.io')return Response.json(url.pathname==='/v1/boards/newco'?{name:'New Company'}:{jobs:url.pathname==='/v1/boards/newco/jobs'?[{id:1,title:'Frontend Engineer',location:{name:'India'},content:'React TypeScript',absolute_url:'https://job-boards.greenhouse.io/newco/jobs/1'}]:[]});
   if(url.hostname==='api.lever.co')return Response.json([]);
   if(url.hostname==='api.smartrecruiters.com')return Response.json({content:[],totalFound:0});
+  if(url.hostname==='www.amazon.jobs')return Response.json({hits:0,jobs:[]});
+  if(url.hostname==='api.ashbyhq.com')return Response.json({jobs:[]});
   throw Error('Unexpected fixture host');
 }
 

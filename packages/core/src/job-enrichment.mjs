@@ -4,6 +4,7 @@ const skills=z.array(z.string().max(40)).max(30);
 export const JobEnrichmentInput=z.object({
   description:z.string().max(40000),
   arrangement:z.enum(['Remote','Hybrid','Onsite','Unknown']),
+  careerStage:z.enum(['Internship','Graduate','Entry-level']).optional(),
   seniority:z.enum(['Junior','Mid','Senior','Lead','Staff']).optional(),
   yearsMin:z.number().min(0).max(50).optional(),yearsMax:z.number().min(0).max(50).optional(),
   compensation:z.object({min:z.number().finite().nonnegative(),max:z.number().finite().nonnegative(),currency:z.string().regex(/^[A-Z]{3}$/),period:z.enum(['year','month','hour']),sourceText:z.string().max(200)}).refine(v=>v.min<=v.max).optional(),
@@ -23,6 +24,9 @@ export function technologyTokens(text){
 
 export function enrichJob({title,description,arrangement='Unknown'}){
   const result={description:description.slice(0,40000),arrangement};
+  if(/\bintern(ship)?\b/i.test(title))result.careerStage='Internship';
+  else if(/\b(graduate|new[ -]grad)\b/i.test(title))result.careerStage='Graduate';
+  else if(/\b(freshers?|entry[ -]level)\b/i.test(title))result.careerStage='Entry-level';
   const section=label=>description.match(new RegExp('\\b(?:'+label+')\\s*:\\s*([\\s\\S]*?)(?=\\b(?:required skills|requirements|preferred skills|nice to have|benefits|responsibilities)\\s*:|$)','i'))?.[1]?.trim();
   const required=section('required skills|requirements'),preferred=section('preferred skills|nice to have'),benefits=section('benefits');
   if(required)result.requiredSkills=technologyTokens(required);
