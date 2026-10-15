@@ -1,4 +1,5 @@
 'use client';
+import {Badge} from '@/components/ui/badge';
 import {ArrowUpRight,Bookmark} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Dialog,DialogContent,DialogTitle,DialogDescription} from '@/components/ui/dialog';
@@ -10,7 +11,7 @@ export default function RoleDetail({job,onClose,onSave,saved,busy}:{job:Job|null
     <div className="role-panel-heading"><CompanyLogo company={job.company}/><div><a className="company-name" href={companyPath(job.source,job.company)}>{job.company}</a><DialogTitle className="detail-title">{job.title}</DialogTitle></div></div>
     <DialogDescription>{job.location} · {job.type} · {job.enrichment?.arrangement||job.mode}</DialogDescription>
     {job.availability==='closed'&&<p className="notice" role="status">This role was absent from the employer’s latest complete feed. Your saved application remains in your tracker.</p>}
-    <div className="detail-pay">{job.salary}</div><div className="job-tags">{job.tags.map(tag=><span key={tag}>{tag}</span>)}</div>
+    <div className="detail-pay">{job.salary}</div><div className="job-tags">{job.tags.map(tag=><Badge variant="secondary" key={tag}>{tag}</Badge>)}</div>
     {job.enrichment?.yearsMin!==undefined&&<p>Experience: {job.enrichment.yearsMin}{job.enrichment.yearsMax?'–'+job.enrichment.yearsMax:'+'} years · extracted from employer requirements</p>}
     <div className="role-description"><h3>About the role</h3><p>{job.enrichment?.description||job.summary}</p></div>
     {!!job.enrichment?.requiredSkills?.length&&<div><h3>Required technologies</h3><p>{job.enrichment.requiredSkills.join(', ')}</p></div>}

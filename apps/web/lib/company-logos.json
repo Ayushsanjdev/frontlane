@@ -18,5 +18,110 @@
     "path": "/companies/cloudsek.png",
     "source": "https://cdn.prod.website-files.com/634fc5026f66af518e897c77/641377c816c6fc1eb7e44654_favicon-32x32.png",
     "website": "https://www.cloudsek.com/"
+  },
+  "Bosch": {
+    "path": "/companies/bosch.ico",
+    "source": "https://www.bosch.com/media/tech/tech_images/favicon.ico",
+    "website": "https://www.bosch.com/"
+  },
+  "SonicWall": {
+    "path": "/companies/sonicwall.ico",
+    "source": "https://www.sonicwall.com/favicon.ico",
+    "website": "https://www.sonicwall.com/"
+  },
+  "Sia": {
+    "path": "/companies/sia.ico",
+    "source": "https://www.sia-partners.com/themes/custom/sia/favicon.ico",
+    "website": "https://www.sia-partners.com/"
+  },
+  "HighLevel": {
+    "path": "/companies/highlevel.png",
+    "source": "https://storage.googleapis.com/msgsndr/knES3eSWYIsc5YSZ3YLl/media/62b48689c85eccb36ca941fc.png",
+    "website": "https://www.gohighlevel.com/"
+  },
+  "Sigmoid": {
+    "path": "/companies/sigmoid.png",
+    "source": "https://www.sigmoid.com/wp-content/uploads/2026/08/sigmoid-favicon-512x512-1-150x150.png",
+    "website": "https://www.sigmoid.com/"
+  },
+  "Hyreo": {
+    "path": "/companies/hyreo.png",
+    "source": "https://hyreo.com/wp-content/uploads/2023/12/cropped-hyreo-logo2-32x32.png",
+    "website": "https://hyreo.com/"
+  },
+  "OpenFX": {
+    "path": "/companies/openfx.png",
+    "source": "https://framerusercontent.com/images/3WIscqEZc8VAfV8S8WzMM4oAk.png",
+    "website": "https://www.openfx.com/"
+  },
+  "Lingaro": {
+    "path": "/companies/lingaro.png",
+    "source": "https://lingarogroup.com/hubfs/logo%20180.png",
+    "website": "https://lingarogroup.com/"
+  },
+  "Nagarro": {
+    "path": "/companies/nagarro.ico",
+    "source": "https://www.nagarro.com/hubfs/favicon-1.ico",
+    "website": "https://www.nagarro.com/"
+  },
+  "Hevo Data": {
+    "path": "/companies/hevo-data.png",
+    "source": "https://res.cloudinary.com/hevo/image/upload/v1763715985/website-rewamp/favicon/white/fav_white_2x_v3tkls.png",
+    "website": "https://hevodata.com/"
+  },
+  "Miratech": {
+    "path": "/companies/miratech.ico",
+    "source": "https://miratechgroup.com/favicon.ico",
+    "website": "https://miratechgroup.com/"
+  },
+  "Sopra Steria": {
+    "path": "/companies/sopra-steria.ico",
+    "source": "https://www.soprasteria.com/ResourcePackages/Bootstrap4/assets/dist/favicon/favicon-Corp.ico",
+    "website": "https://www.soprasteria.com/"
+  },
+  "Okta": {
+    "path": "/companies/okta.ico",
+    "source": "https://www.okta.com/favicon.ico",
+    "website": "https://www.okta.com/"
+  },
+  "Netskope": {
+    "path": "/companies/netskope.ico",
+    "source": "https://www.netskope.com/favicon.ico",
+    "website": "https://www.netskope.com/"
+  },
+  "Acceldata": {
+    "path": "/companies/acceldata.png",
+    "source": "https://cdn.prod.website-files.com/64fef88ee8b22d3d21b71560/657ee2dfe263ba3262c33326_favicon.png",
+    "website": "https://www.acceldata.io/"
+  },
+  "BondScanner": {
+    "path": "/companies/bondscanner.png",
+    "source": "https://bondscanner.com/favicon.ico",
+    "website": "https://bondscanner.com/"
+  },
+  "Pepsales": {
+    "path": "/companies/pepsales.png",
+    "source": "https://cdn.prod.website-files.com/66d402ff17bc21523bb8cd7e/66d4a8618b4f7b26a32953b5_icon-pepsales-cheetha-32.png",
+    "website": "https://www.pepsales.ai/"
+  },
+  "Veyra": {
+    "path": "/companies/veyra.ico",
+    "source": "https://www.veyraweb.com/favicon.ico?favicon.0x3dzn~oxb6tn.ico",
+    "website": "https://www.veyraweb.com/"
+  },
+  "BitGo": {
+    "path": "/companies/bitgo.ico",
+    "source": "https://bitgo.com/static/icons/favicon.ico",
+    "website": "https://bitgo.com/"
+  },
+  "NEC Software Solutions": {
+    "path": "/companies/nec-software-solutions.png",
+    "source": "https://www.necsws.com/wp-content/uploads/2026/09/cropped-favicon-96x96-2-150x150.png",
+    "website": "https://www.necsws.com/"
+  },
+  "MeltPlan": {
+    "path": "/companies/meltplan.png",
+    "source": "https://s9-recruiting.cdn.greenhouse.io/external_greenhouse_job_boards/logos/400/112/000/original/MeltPlan_Logomark_Color_Light_Background_RGB.png?1751619287",
+    "website": "https://job-boards.greenhouse.io/meltplan"
   }
 }

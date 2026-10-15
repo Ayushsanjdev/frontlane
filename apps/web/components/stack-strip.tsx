@@ -1,4 +1,5 @@
 'use client';
+import {Button} from '@/components/ui/button';
 
 import {useState} from 'react';
 import {Pause,Play} from 'lucide-react';
@@ -20,9 +21,9 @@ export function StackStrip(){
   return <section className="stack-strip" aria-label="Frontend technologies">
     <div className="stack-heading">
       <span>Your stack. Your opportunities.</span>
-      <button className="stack-motion-toggle" type="button" onClick={()=>setPaused(!paused)} aria-label={paused?'Play stack animation':'Pause stack animation'} aria-pressed={paused}>
+      <Button variant="ghost" size="sm" className="stack-motion-toggle" type="button" onClick={()=>setPaused(!paused)} aria-label={paused?'Play stack animation':'Pause stack animation'} aria-pressed={paused}>
         {paused?<Play size={14}/>:<Pause size={14}/>}
-      </button>
+      </Button>
     </div>
     <div className="stack-window">
       <div className="stack-track" style={{animationPlayState:paused?'paused':'running'}}>
