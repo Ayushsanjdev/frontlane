@@ -33,3 +33,21 @@ Plan: `2026-10-14-web-career-workspace.md`; design: `2026-10-14-web-career-works
 
 - Final post-snapshot-fix verification: 128/128 tests, production build, sequential shared typecheck, and git diff --check all passed. Disposable preview stopped; user dev server untouched.
 - Ruling: private contacts/interviews/documents/offers are bounded structured records in the versioned application workspace, updated atomically through owner-scoped PATCH rather than separate child CRUD routes. This preserves privacy and legacy payload compatibility while delivering the same web capabilities.
+
+## Production activation — 2026-10-15 IST
+
+- User requested activation, superseding the earlier local-only restriction.
+- Saved Neon production snapshot `snap-summer-silence-b5svcvhd` on `br-gentle-union-b5k5beif`, project `restless-boat-76887992`, before applying migrations. `pnpm db:migrate` succeeded transactionally.
+- Committed and pushed approved implementation as `5bc191e`; preserved the existing unstaged generated next-env.d.ts change. Vercel production deployment `4dMpAbBnkQbH7mTyJcbL6L7C8K5o` is Ready at https://frontlanejobs.vercel.app.
+- Public jobs, companies and comparison pages return 200. Unauthenticated tracker, digest subscription and digest cron APIs return 401. Existing signed-in profile and tracker load from production.
+- Existing daily employer refresh cron 8632316 remains at 02:30 UTC / 08:00 IST. Added enabled retry cron 8647324 for `/api/cron/digests`, every ten minutes, cloned existing bearer configuration, with response-body storage disabled. Scheduler test returned 200 in 573 ms and `{"available":false}`.
+- Email sending is not active: production lacks RESEND_API_KEY, EMAIL_FROM and RESEND_WEBHOOK_SECRET. Resend login/domain input requested from user. Email subscription is correctly disabled until configuration exists. No real digest was sent.
+- Deployment and scheduler screenshots are under docs/screenshots.
+
+## Gmail sender support — 2026-10-15
+
+- User cannot buy a domain and selected frontlanejobs@gmail.com. Added authenticated Gmail SMTP alongside Resend, preserving matching/all opt-ins and unsubscribe.
+- Added migration 010 with durable rolling-24h send reservations (app cap100) and attempted-transport tracking. Uncertain SMTP responses and expired Gmail leases are held; explicit SMTP temporary rejections can retry. Provider changes after an attempt are held.
+- Focused review found generic550 suppression and pending sender/provider-switch errors; regression tests reproduced both and fixes passed. Follow-up review found no remaining Important/Critical issues.
+- Verified 134/134 tests, pnpm build, pnpm typecheck (web/mobile consumers), and git diff --check. Production migration succeeded. New Neon snapshot attempt failed due provider snapshot quota; existing pre-workspace snapshot was preserved.
+- Saved production EMAIL_PROVIDER=gmail and GMAIL_USER=frontlanejobs@gmail.com. GMAIL_APP_PASSWORD is still absent; user must enter it directly into the prepared Vercel secret form. Google currently reports app passwords unavailable for this account, likely until two-step verification is completed. No credentials were read or stored in Git. No live Gmail message was sent.

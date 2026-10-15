@@ -48,8 +48,8 @@ export async function queueDailyDigests(db,{publicationDay:day=publicationDay(),
     return {queued,complete};
   });
 }
-/** @param {any} db @param {{transport?:Function,now?:Date,limit?:number,paceMs?:number,signal?:AbortSignal}} options */
-export async function drainDigestOutbox(db,{transport,now=new Date(),limit=20,paceMs=1000,signal}={}){
+/** @param {any} db @param {{transport?:Function,transportName?:string,from?:string,gmailDailyLimit?:number,now?:Date,limit?:number,paceMs?:number,signal?:AbortSignal}} options */
+export async function drainDigestOutbox(db,{transport,transportName='resend',from,gmailDailyLimit=100,now=new Date(),limit=20,paceMs=1000,signal}={}){
   const stats={accepted:0,failed:0,retry:0,ambiguous:0,suppressed:0,expired:0};
   if(!transport)return stats;
   for(let index=0;index<Math.min(limit,100);index++){
@@ -61,22 +61,35 @@ export async function drainDigestOutbox(db,{transport,now=new Date(),limit=20,pa
       const sub=(await client.query('SELECT enabled,suppressed,generation,email FROM digest_subscriptions WHERE user_id=$1',[candidate.user_id])).rows[0];
       let status;
       if(!sub?.enabled||sub.suppressed||sub.generation!==candidate.generation||sub.email!==candidate.recipient)status='suppressed';
+      else if(candidate.attempts>0&&(candidate.delivery_transport||'resend')!==transportName)status='ambiguous';
+      else if(transportName==='gmail'&&candidate.status==='sending'&&candidate.attempts>0)status='ambiguous';
       else if(candidate.first_attempt_at&&current.getTime()-new Date(candidate.first_attempt_at).getTime()>=23*3600000)status='ambiguous';
       else if(!candidate.first_attempt_at&&current.getTime()-new Date(candidate.created_at).getTime()>48*3600000)status='expired';
       if(status){await client.query('UPDATE email_deliveries SET status=$2 WHERE id=$1',[candidate.id,status]);stats[status]++;return {skip:true}}
-      return (await client.query("UPDATE email_deliveries SET status='sending',claim_id=$2,lease_until=$3,first_attempt_at=COALESCE(first_attempt_at,$4),attempts=attempts+1 WHERE id=$1 RETURNING *",[candidate.id,claim,new Date(current.getTime()+30000),current])).rows[0];
+      // Bind the current provider's sender once, before any delivery attempt.
+      if(candidate.attempts===0&&from)await client.query("UPDATE email_deliveries SET body=jsonb_set(body,'{from}',to_jsonb($2::text)) WHERE id=$1",[candidate.id,from]);
+      if(transportName==='gmail'){
+        await client.query('SELECT pg_advisory_xact_lock(hashtext($1))',['gmail-digest-send-budget']);
+        const count=(await client.query("SELECT count(*)::int AS n FROM gmail_send_attempts WHERE created_at>now()-interval '24 hours'")).rows[0].n;
+        if(count>=Math.min(100,Math.max(1,gmailDailyLimit)))return null;
+        await client.query('INSERT INTO gmail_send_attempts(delivery_id) VALUES($1)',[candidate.id]);
+        await client.query("DELETE FROM gmail_send_attempts WHERE created_at<now()-interval '7 days'");
+      }
+      return (await client.query("UPDATE email_deliveries SET status='sending',claim_id=$2,lease_until=$3,first_attempt_at=COALESCE(first_attempt_at,$4),attempts=attempts+1,delivery_transport=$5 WHERE id=$1 RETURNING *",[candidate.id,claim,new Date(current.getTime()+30000),current,transportName])).rows[0];
     });
     if(!row)break;if(row.skip)continue;
+    let acceptedByProvider=false;
     try{
       const check=(await db.query('SELECT enabled,suppressed,generation FROM digest_subscriptions WHERE user_id=$1',[row.user_id])).rows[0];
       if(!check?.enabled||check.suppressed||check.generation!==row.generation){await db.query("UPDATE email_deliveries SET status='suppressed' WHERE id=$1 AND claim_id=$2",[row.id,claim]);stats.suppressed++;continue}
       const result=await transport({body:row.body,idempotencyKey:'frontlane-digest/'+row.id,signal});
       if(!result?.providerId)throw Error('Invalid email provider response');
+      acceptedByProvider=true;
       await db.query("UPDATE email_deliveries SET status='accepted',provider_id=$3,lease_until=NULL,last_error=NULL WHERE id=$1 AND claim_id=$2",[row.id,claim,result.providerId]);stats.accepted++;
     }catch(error){
-      const permanent=error?.permanent===true,status=permanent?'failed':'retry',delays=[60000,300000,900000,3600000];
+      const permanent=error?.permanent===true,status=error?.ambiguous===true||transportName==='gmail'&&acceptedByProvider?'ambiguous':permanent?'failed':'retry',delays=[60000,300000,900000,3600000];
       const delay=Math.max(delays[Math.min(row.attempts-1,3)],error?.retryAfterMs||0);
-      await db.query('UPDATE email_deliveries SET status=$3,next_attempt_at=$4,last_error=$5,lease_until=NULL WHERE id=$1 AND claim_id=$2',[row.id,claim,status,new Date(current.getTime()+delay),permanent?'Permanent provider rejection':'Temporary or uncertain provider failure']);stats[status]++;
+      await db.query('UPDATE email_deliveries SET status=$3,next_attempt_at=$4,last_error=$5,lease_until=NULL WHERE id=$1 AND claim_id=$2',[row.id,claim,status,new Date(current.getTime()+delay),status==='ambiguous'?'Uncertain delivery; manual reconciliation required':permanent?'Permanent provider rejection':'Temporary or uncertain provider failure']);stats[status]++;
       if(error?.suppressRecipient)await db.query('UPDATE digest_subscriptions SET suppressed=true,enabled=false WHERE user_id=$1 AND email=$2',[row.user_id,row.recipient]);
     }
     if(paceMs&&index<limit-1&&!signal?.aborted)await new Promise(resolve=>{const timer=setTimeout(resolve,paceMs);signal?.addEventListener('abort',()=>{clearTimeout(timer);resolve()},{once:true})});
